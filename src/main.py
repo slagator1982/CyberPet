@@ -98,35 +98,33 @@ class CyberPet(QMainWindow):
         self.anim_timer.start(anim_data.get("speed", 150))
 
     def update_scale(self):
-        """Calcula la altura base basándose en la posición Y (Perspectiva)"""
-        # Obtenemos la geometría de la pantalla
-        screen = QApplication.primaryScreen().geometry()
-        screen_height = screen.height()
+        env = self.config.get("environment", {})
+        if not env.get("perspective_enabled", True) or env.get("mode") != "perspective":
+            return self.base_height
+
+        screen_h = QApplication.primaryScreen().geometry().height()
         
-        # Obtenemos la posición Y actual del robot (Y=0 es arriba)
+        # Obtenemos límites desde el config (en porcentaje)
+        y_min = (env.get("walkable_y_min_pc", 0) / 100) * screen_h
+        y_max = (env.get("walkable_y_max_pc", 100) / 100) * screen_h
+        min_scale = env.get("min_scale_percent", 60) / 100
+        
+        # Calculamos factor de escala basado en la posición Y actual
+        # Si Y está en y_min -> min_scale | Si Y está en y_max -> 1.0
         current_y = self.y()
+        if y_max == y_min: return self.base_height
         
-        # Definimos el rango de escalado (min y max)
-        # El robot se encogerá hasta el 60% de su base_height
-        min_scale = 0.6 
-        max_scale = 1.0
+        factor = (current_y - y_min) / (y_max - y_min)
+        factor = max(0, min(factor, 1)) # Clamp entre 0 y 1
         
-        # Calculamos el factor de escala (normalizado entre 0.0 y 1.0)
-        # 0.0 es arriba de la pantalla, 1.0 es abajo.
-        scale_factor = current_y / screen_height
-        
-        # Invertimos para que arriba sea pequeño y abajo grande
-        scale_factor = 1.0 - scale_factor
-        
-        # Aplicamos el rango (clamp)
-        scale_factor = max(min_scale, min(scale_factor, max_scale))
-        
-        # Retornamos la altura calculada
-        return int(self.base_height * scale_factor)
+        scale = min_scale + (factor * (1.0 - min_scale))
+        return int(self.base_height * scale)
 
     def update_animation(self):
         # 1. Movimiento físico (IA y Arrastre)
         if not self.is_dragging:
+            # No salirse de la pantalla
+            self.check_screen_bounds()
             # Movimiento Diagonal: Sumamos ambas velocidades
             self.move(self.pos() + QPoint(self.current_move_speed, self.current_y_speed))
 
@@ -210,6 +208,41 @@ class CyberPet(QMainWindow):
             self.change_state("angry", "alarm")
             self.current_y_speed = 0
 
+    def check_screen_bounds(self):
+        env = self.config.get("environment", {})
+        mode = env.get("mode", "free")
+        screen = QApplication.primaryScreen().geometry()
+        margin = 20
+        
+        # Definir límites de movimiento según el modo
+        if mode == "floor":
+            # Solo en el borde inferior (Barra de tareas)
+            target_y = screen.height() - self.height() - margin
+            self.move(self.x(), target_y)
+            self.current_y_speed = 0 # Prohibimos movimiento vertical
+            min_y, max_y = target_y, target_y
+        elif mode == "perspective":
+            min_y = (env.get("walkable_y_min_pc", 0) / 100) * screen.height()
+            max_y = (env.get("walkable_y_max_pc", 100) / 100) * screen.height() - self.height()
+        else: # "free"
+            min_y = margin
+            max_y = screen.height() - self.height() - margin
+
+        # Rebote Horizontal
+        if self.x() < margin:
+            self.current_move_speed = abs(self.current_move_speed or 2)
+            self.change_state("look_r")
+        elif self.x() > screen.width() - self.width() - margin:
+            self.current_move_speed = -abs(self.current_move_speed or 2)
+            self.change_state("look_l")
+
+        # Rebote Vertical (Solo si no es modo floor)
+        if mode != "floor":
+            if self.y() < min_y:
+                self.current_y_speed = abs(self.current_y_speed or 2)
+            elif self.y() > max_y:
+                self.current_y_speed = -abs(self.current_y_speed or 2)
+                
     # --- Arrastre X11 compatible ---
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
