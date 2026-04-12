@@ -1,6 +1,6 @@
 {
     "skin_name": "CyberDroid Original",
-    "base_height": 180,
+    "base_height": 130,
     "animations": {
         "idle": { "file": "idle.png", "cols": 6, "speed": 150, "move_speed": 0 },
         "look_l": { "file": "look_left.png", "cols": 6, "speed": 150, "move_speed": -5 },
