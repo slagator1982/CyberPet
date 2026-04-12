@@ -5,7 +5,7 @@
         "mode": "perspective", 
         "perspective_enabled": true,
         "min_scale_percent": 10,
-        "walkable_y_min_pc": 80,
+        "walkable_y_min_pc": 50,
         "walkable_y_max_pc": 100
     },
     "animations": {
