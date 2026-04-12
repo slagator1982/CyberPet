@@ -3,8 +3,7 @@
     "base_height": 250,
     "environment": {
         "mode": "perspective", 
-        "perspective_enabled": true,
-        "min_scale_percent": 10,
+        "min_scale_percent": 30,
         "walkable_y_min_pc": 50,
         "walkable_y_max_pc": 100
     },
