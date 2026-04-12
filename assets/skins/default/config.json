@@ -1,0 +1,13 @@
+{
+    "skin_name": "CyberDroid Original",
+    "base_height": 200,
+    "animations": {
+        "idle": { "file": "idle.png", "cols": 6 },
+        "look_l": { "file": "look_left.png", "cols": 6 },
+        "look_r": { "file": "look_right.png", "cols": 6 },
+        "sleep": { "file": "sleep.png", "cols": 6 },
+        "angry": { "file": "angry.png", "cols": 6 },
+        "drag_id": { "file": "drag_idle.png", "cols": 6 },
+        "drag_mv": { "file": "drag_move_gemini.png", "cols": 6 }
+    }
+}
