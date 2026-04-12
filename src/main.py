@@ -34,7 +34,7 @@ class SpeechBubble(QWidget):
 class CyberPet(QMainWindow):
     def __init__(self, skin_folder):
         super().__init__()
-        # Mantenemos la ventana siempre arriba
+        # Mantener siempre encima y sin bordes
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         
@@ -53,30 +53,33 @@ class CyberPet(QMainWindow):
             with open(os.path.join(self.skin_path, "config.json"), "r") as f:
                 self.config = json.load(f)
         except Exception as e:
-            print(f"Error crítico: {e}")
+            print(f"Error crítico cargando JSON: {e}")
             sys.exit(1)
             
         self.base_height = self.config.get("base_height", 255)
-        # Lienzo fijo para evitar vibraciones de píxeles
+        # Lienzo fijo para evitar vibraciones al escalar
         self.canvas_size = int(self.base_height * 1.3) 
         self.setFixedSize(self.canvas_size, self.canvas_size)
         
         self.bubble = SpeechBubble()
+        
+        # Timer principal de animación
         self.anim_timer = QTimer()
         self.anim_timer.timeout.connect(self.update_animation)
         
+        # Timer de IA para toma de decisiones
         self.ai_timer = QTimer()
         self.ai_timer.timeout.connect(self.ai_think)
         self.ai_timer.start(4000)
         
         self.load_animation(self.current_state)
-        # Render inicial para cálculo de dimensiones
+        # Renderizado inicial para establecer dimensiones
         self.update_animation()
         self.set_initial_position()
         self.show()
 
     def set_initial_position(self):
-        """Posicionamiento inicial dentro de los límites de perspectiva"""
+        """Ubica al robot en el límite inferior configurado al arrancar"""
         screen = QApplication.primaryScreen().geometry()
         env = self.config.get("environment", {})
         y_max_pc = env.get("walkable_y_max_pc", 100) / 100
@@ -86,7 +89,7 @@ class CyberPet(QMainWindow):
         self.move(x_pos, y_pos)
 
     def update_scale(self):
-        """Lógica LERP para escalar según la posición Y"""
+        """Calcula la escala LERP según la posición vertical"""
         env = self.config.get("environment", {})
         
         if env.get("mode") != "perspective":
@@ -100,14 +103,14 @@ class CyberPet(QMainWindow):
 
         min_scale = env.get("min_scale_percent", 60) / 100
         
-        # t: posición relativa en el pasillo Y (0 a 1)
+        # t: posición relativa de 0.0 (lejos) a 1.0 (cerca)
         t = (self.y() - y_min) / (y_max - y_min)
         t = max(0.0, min(float(t), 1.0))
         
         return int(self.base_height * (min_scale + t * (1.0 - min_scale)))
 
     def check_screen_bounds(self):
-        """Verifica colisiones con los límites configurados"""
+        """Gestiona colisiones y rebotes con los bordes"""
         env = self.config.get("environment", {})
         mode = env.get("mode", "perspective")
         screen = QApplication.primaryScreen().geometry()
@@ -123,6 +126,7 @@ class CyberPet(QMainWindow):
             if self.y() < y_min: self.current_y_speed = abs(self.current_y_speed or 2)
             elif self.y() > y_max: self.current_y_speed = -abs(self.current_y_speed or 2)
 
+        # Rebote horizontal
         if self.x() < margin:
             self.current_move_speed = abs(self.current_move_speed or 2)
             self.change_state("look_r")
@@ -131,6 +135,7 @@ class CyberPet(QMainWindow):
             self.change_state("look_l")
 
     def load_animation(self, state):
+        """Carga el spritesheet correspondiente al estado"""
         anim_data = self.config["animations"].get(state, self.config["animations"]["idle"])
         self.full_sheet = QPixmap(os.path.join(self.skin_path, anim_data["file"]))
         self.cols = anim_data["cols"]
@@ -141,14 +146,16 @@ class CyberPet(QMainWindow):
         self.anim_timer.start(anim_data.get("speed", 150))
 
     def update_animation(self):
-        """Ciclo principal de actualización"""
+        """Actualiza posición, escala y dibujo del frame"""
         if not self.is_dragging:
             self.check_screen_bounds()
             self.move(int(self.x() + self.current_move_speed), int(self.y() + self.current_y_speed))
 
+        # Calcular dimensiones con perspectiva
         target_h = self.update_scale()
         target_w = int(target_h * (self.frame_w / self.frame_h))
 
+        # Recortar frame del sheet
         x_src = self.current_frame * self.frame_w
         rect_src = QRect(x_src, 0, self.frame_w, self.frame_h)
         pix_frame = self.full_sheet.copy(rect_src).scaled(
@@ -157,10 +164,12 @@ class CyberPet(QMainWindow):
             Qt.TransformationMode.SmoothTransformation
         )
         
+        # Preparar lienzo transparente
         canvas = QPixmap(self.canvas_size, self.canvas_size)
         canvas.fill(Qt.GlobalColor.transparent)
         
         painter = QPainter(canvas)
+        # Dibujar frame centrado en el lienzo
         painter.drawPixmap(
             int((self.canvas_size - target_w) / 2), 
             int((self.canvas_size - target_h) / 2), 
@@ -168,14 +177,18 @@ class CyberPet(QMainWindow):
         )
         painter.end()
 
+        # Actualizar visuales y asegurar tamaño del label
         self.label.setPixmap(canvas)
-        self.label.setFixedSize(self.canvas_size, self.canvas_size)
+        self.label.setFixedSize(self.canvas_size, self.canvas_size) # LINEA RESTAURADA
+        
         self.current_frame = (self.current_frame + 1) % self.cols
         
+        # Reposicionar bocadillo si está activo
         if self.bubble.isVisible():
             self.bubble.move(self.x() + (self.width()//2) - (self.bubble.width()//2), self.y() - 40)
 
     def ai_think(self):
+        """Lógica de comportamiento aleatorio"""
         if self.is_dragging: return
         dice = random.randint(1, 100)
         if dice <= 40:
@@ -196,7 +209,7 @@ class CyberPet(QMainWindow):
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.is_dragging = True
-            # TRAER AL FRENTE AL HACER CLICK
+            # Traer al frente al interactuar
             self.raise_()
             if self.bubble.isVisible(): self.bubble.raise_()
             
