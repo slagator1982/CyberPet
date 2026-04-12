@@ -1,13 +1,62 @@
 {
     "skin_name": "CyberDroid Original",
-    "base_height": 200,
+    "base_height": 180,
     "animations": {
-        "idle": { "file": "idle.png", "cols": 6 },
-        "look_l": { "file": "look_left.png", "cols": 6 },
-        "look_r": { "file": "look_right.png", "cols": 6 },
-        "sleep": { "file": "sleep.png", "cols": 6 },
-        "angry": { "file": "angry.png", "cols": 6 },
-        "drag_id": { "file": "drag_idle.png", "cols": 6 },
-        "drag_mv": { "file": "drag_move_gemini.png", "cols": 6 }
+        "idle": { 
+            "file": "idle.png", 
+            "cols": 6, 
+            "speed": 150 
+        },
+        "look_l": { 
+            "file": "look_left.png", 
+            "cols": 6, 
+            "speed": 200 
+        },
+        "look_r": { 
+            "file": "look_right.png", 
+            "cols": 6, 
+            "speed": 200 
+        },
+        "sleep": { 
+            "file": "sleep.png", 
+            "cols": 6, 
+            "speed": 500 
+        },
+        "angry": { 
+            "file": "angry.png", 
+            "cols": 6, 
+            "speed": 70 
+        },
+        "drag_id": { 
+            "file": "drag_idle.png", 
+            "cols": 6, 
+            "speed": 120 
+        },
+        "drag_mv": { 
+            "file": "drag_move_gemini.png", 
+            "cols": 6, 
+            "speed": 90 
+        }
+    },
+    "dialogs": {
+        "glitch": [
+            "▰▱▰▱ ⬡⬢", 
+            "▓▒░ SYNC_ERR ░▒▓", 
+            "⏷⏶ ⏵⏴ ⏷⏶", 
+            "🯅 🯆 🯇 🯈"
+        ],
+        "binary_corrupt": [
+            "1011Ø1𝟢1", 
+            "ØxDEADCØDE", 
+            "Σ𝝮ΓΔ", 
+            "√π ÷ ∞"
+        ],
+        "alarm": [
+            "▲▲ WARNING ▲▲", 
+            "█▓▒░ CRITICAL_HACK ░▒▓█", 
+            "⬢⬢⬢", 
+            "🕱 🕱 🕱"
+        ]
+        
     }
 }
