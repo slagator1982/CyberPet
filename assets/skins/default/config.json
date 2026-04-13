@@ -25,7 +25,20 @@
         },
         "angry": { "file": "angry.png", "cols": 6, "speed": 80, "move_speed": 0, "move_speed_y": 0 },
         "drag_id": { "file": "drag_idle.png", "cols": 6, "speed": 120, "move_speed": 0, "move_speed_y": 0 },
-        "drag_mv": { "file": "drag_move_gemini.png", "cols": 6, "speed": 90, "move_speed": 0, "move_speed_y": 0 }
+        "drag_mv": { 
+            "file": "drag_move_gemini.png", 
+            "cols": 6, 
+            "speed": 90, 
+            "move_speed": 0, 
+            "move_speed_y": 0 
+        },
+        "fall": { 
+            "file": "drag_move_gemini.png", 
+            "cols": 6, 
+            "speed": 80, 
+            "move_speed": 0, 
+            "move_speed_y": 45 
+        }
     },
     "dialogs": {
         "glitch": ["▰▱▰▱", "▓▒░ ERROR ░▒▓", "⬡⬢"],

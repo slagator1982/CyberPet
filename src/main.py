@@ -43,14 +43,15 @@ class CyberPet(QMainWindow):
         
         self.skin_path = skin_folder
         self.is_dragging = False
-        self.is_falling = False       # NUEVO: Estado de caída
-        self.grab_y = 0               # NUEVO: Memoria del suelo
-        self.locked_scale = 255       # NUEVO: Memoria del tamaño
+        self.is_falling = False
+        self.grab_y = 0               
+        self.locked_scale = 255       
         
         self.current_state = "idle"
         self.current_frame = 0
         self.current_move_speed = 0
         self.current_y_speed = 0
+        self.current_fall_speed = 35 # NUEVO: Velocidad base de caída
 
         # Cargar configuración desde JSON
         try:
@@ -94,7 +95,6 @@ class CyberPet(QMainWindow):
 
     def update_scale(self):
         """Calcula la escala LERP según la posición vertical"""
-        # NUEVO: Si está agarrado o cayendo, devolver la escala bloqueada
         if self.is_dragging or self.is_falling:
             return self.locked_scale
 
@@ -111,7 +111,6 @@ class CyberPet(QMainWindow):
 
         min_scale = env.get("min_scale_percent", 60) / 100
         
-        # t: posición relativa de 0.0 (lejos) a 1.0 (cerca)
         t = (self.y() - y_min) / (y_max - y_min)
         t = max(0.0, min(float(t), 1.0))
         
@@ -148,6 +147,10 @@ class CyberPet(QMainWindow):
         self.full_sheet = QPixmap(os.path.join(self.skin_path, anim_data["file"]))
         self.cols = anim_data["cols"]
         self.current_move_speed = anim_data.get("move_speed", 0)
+        
+        # NUEVO: Lee la velocidad de caída desde el JSON (si no existe, usa 35)
+        self.current_fall_speed = anim_data.get("fall_speed", 35)
+        
         self.frame_w = self.full_sheet.width() // self.cols
         self.frame_h = self.full_sheet.height()
         self.current_frame = 0
@@ -155,10 +158,9 @@ class CyberPet(QMainWindow):
 
     def update_animation(self):
         """Ciclo principal de físicas y dibujado"""
-        # --- NUEVAS FÍSICAS DE CAÍDA ---
         if self.is_falling:
-            # Cae varios píxeles por frame para simular gravedad rápida
-            new_y = self.y() + 35 
+            # Cae usando la velocidad dinámica extraída del JSON
+            new_y = self.y() + self.current_fall_speed 
             
             # Si cruza la línea del suelo original, aterriza
             if new_y >= self.grab_y:
@@ -223,14 +225,12 @@ class CyberPet(QMainWindow):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
-            # NUEVO: Guardar escala y posición del suelo antes de levantarlo
-            # (Si lo pillas al vuelo mientras cae, mantiene el suelo original)
             if not self.is_falling:
                 self.locked_scale = self.update_scale()
                 self.grab_y = self.y()
 
             self.is_dragging = True
-            self.is_falling = False # Detiene la caída si lo coges en el aire
+            self.is_falling = False 
             
             self.raise_()
             if self.bubble.isVisible(): self.bubble.raise_()
@@ -248,14 +248,11 @@ class CyberPet(QMainWindow):
         if event.button() == Qt.MouseButton.LeftButton:
             self.is_dragging = False
             
-            # NUEVO: Física de caída al soltar
             if self.y() < self.grab_y:
-                # Si lo soltaste más alto que el suelo original, cae
                 self.is_falling = True
-                self.change_state("drag_mv")
+                # NUEVO: Llama al estado de caída en lugar de drag_mv
+                self.change_state("fall") 
             else:
-                # Si lo arrastraste hacia abajo (por debajo de su suelo),
-                # se considera que lo has posado en una nueva zona más cercana.
                 self.change_state("idle")
 
 if __name__ == "__main__":
