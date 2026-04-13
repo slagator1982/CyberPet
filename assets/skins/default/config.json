@@ -7,6 +7,9 @@
         "walkable_y_min_pc": 50,
         "walkable_y_max_pc": 100
     },
+    "gravity": 1.2,
+    "launch_multiplier": 0.8,
+    "friction": 0.95,
     "animations": {
         "idle": { "file": "idle.png", "cols": 6, "speed": 150, "move_speed": 0, "move_speed_y": 0 },
         "look_l": { 
@@ -37,8 +40,7 @@
             "cols": 6, 
             "speed": 80, 
             "move_speed": 0, 
-            "move_speed_y": 0,
-            "gravity": 1.2
+            "move_speed_y": 0
         }
     },
     "dialogs": {

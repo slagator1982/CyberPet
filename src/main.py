@@ -68,16 +68,22 @@ class CyberPet(QMainWindow):
         self.full_sheet = QPixmap(img_path)
         
         if self.full_sheet.isNull():
-            print(f"ADVERTENCIA: No se ve la imagen en {img_path}")
-            # Creamos una imagen de error temporal (Cuadro magenta) para debug
             self.full_sheet = QPixmap(100, 100)
             self.full_sheet.fill(QColor("magenta"))
             self.cols = 1
         else:
             self.cols = anim_data["cols"]
 
+        # LÓGICA DE HERENCIA:
+        # 1. Mira si la animación tiene gravedad propia.
+        # 2. Si no, mira si hay una gravedad general en el JSON.
+        # 3. Si no hay nada, usa 0.8 por defecto.
+        self.gravity_factor = anim_data.get("gravity", self.config.get("gravity", 0.8))
+        
+        # También podemos hacer lo mismo con el rozamiento si quisieras
+        self.friction = anim_data.get("friction", self.config.get("friction", 0.97))
+
         self.current_move_speed = anim_data.get("move_speed", 0)
-        self.gravity_factor = anim_data.get("gravity", 0.8)
         self.frame_w = self.full_sheet.width() // self.cols
         self.frame_h = self.full_sheet.height()
         self.current_frame = 0
