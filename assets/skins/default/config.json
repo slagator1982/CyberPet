@@ -37,7 +37,8 @@
             "cols": 6, 
             "speed": 80, 
             "move_speed": 0, 
-            "move_speed_y": 45 
+            "move_speed_y": 0,
+            "gravity": 1.2
         }
     },
     "dialogs": {
