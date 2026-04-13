@@ -4,12 +4,11 @@ import json
 import random
 from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt6.QtCore import QTimer, Qt, QRect, QPoint, QSize
-from PyQt6.QtGui import QPixmap, QColor, QPainter, QBitmap
+from PyQt6.QtGui import QPixmap, QColor, QPainter
 
 class CyberPet(QMainWindow):
     def __init__(self, skin_folder):
         super().__init__()
-        # Configuración de ventana para transparencia
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -26,23 +25,20 @@ class CyberPet(QMainWindow):
         self.vel_x = 0.0              
         self.vel_y = 0.0              
 
-        # Carga de configuración
         try:
             config_file = os.path.join(self.skin_path, "config.json")
             with open(config_file, "r") as f:
                 self.config = json.load(f)
         except Exception as e:
-            print(f"\n[ERROR] No se pudo leer config.json: {e}")
+            sys.stdout.write(f"\n[ERROR] JSON: {e}\n")
             sys.exit(1)
             
-        # Parámetros desde JSON
         self.base_height = self.config.get("base_height", 250)
         self.launch_mult = self.config.get("launch_multiplier", 0.8)
         self.friction = self.config.get("friction", 0.95)
         self.gravity_factor = self.config.get("gravity", 1.2)
         
         self.locked_scale = self.base_height 
-        # Lienzo grande para permitir rotaciones o efectos futuros
         self.canvas_size_val = int(self.base_height * 2.0)
         self.setFixedSize(self.canvas_size_val, self.canvas_size_val)
         
@@ -64,13 +60,11 @@ class CyberPet(QMainWindow):
     def load_animation(self, state):
         anim_data = self.config["animations"].get(state, self.config["animations"]["idle"])
         img_path = os.path.join(self.skin_path, anim_data["file"])
-        
         self.full_sheet = QPixmap(img_path)
         
-        # Si la imagen falla, creamos un sprite de emergencia visible
         if self.full_sheet.isNull():
-            self.full_sheet = QPixmap(200, 200)
-            self.full_sheet.fill(QColor(255, 0, 255, 180)) # Magenta semitransparente
+            self.full_sheet = QPixmap(100, 100)
+            self.full_sheet.fill(QColor(255, 0, 255, 180))
             self.cols = 1
         else:
             self.cols = anim_data["cols"]
@@ -83,7 +77,7 @@ class CyberPet(QMainWindow):
         self.anim_timer.start(anim_data.get("speed", 150))
 
     def update_animation(self):
-        # 1. Lógica de físicas
+        # Físicas
         if self.is_falling:
             self.vel_y += self.gravity_factor
             self.vel_x *= self.friction
@@ -99,44 +93,35 @@ class CyberPet(QMainWindow):
             self.check_screen_bounds()
             self.move(int(self.x() + self.current_move_speed), self.y())
 
-        # 2. Renderizado
+        # Renderizado (Lógica restaurada que funcionaba)
         new_h = self.update_scale()
         new_w = int(new_h * (self.frame_w / self.frame_h))
         self.real_sprite_size = QSize(new_w, new_h)
 
         x_offset = self.current_frame * self.frame_w
-        # Extraemos el frame y lo escalamos
-        frame_pix = self.full_sheet.copy(QRect(x_offset, 0, self.frame_w, self.frame_h)).scaled(
+        pix = self.full_sheet.copy(QRect(x_offset, 0, self.frame_w, self.frame_h)).scaled(
             new_w, new_h, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
         )
         
-        # Preparamos el lienzo final
-        canvas = QPixmap(self.size())
+        canvas = QPixmap(self.width(), self.height())
         canvas.fill(Qt.GlobalColor.transparent)
-        
-        painter = QPainter(canvas)
-        draw_x = (self.width() - new_w) // 2
-        draw_y = (self.height() - new_h) // 2
-        painter.drawPixmap(draw_x, draw_y, frame_pix)
-        painter.end()
+        p = QPainter(canvas)
+        p.drawPixmap((self.width() - new_w)//2, (self.height() - new_h)//2, pix)
+        p.end()
         
         self.label.setPixmap(canvas)
         self.label.setGeometry(0, 0, self.width(), self.height())
+        self.setMask(canvas.mask())
         
-        # 3. Máscara de clic mejorada
-        # Usamos un umbral de bits para que incluso los bordes suaves sean clicables
-        mask = canvas.createMaskFromColor(Qt.GlobalColor.transparent, Qt.MaskMode.MaskInColor)
-        self.setMask(mask)
-        
-        # 4. BARRA DE DEBUG MEJORADA (Sin eliminar valores)
+        # Barra de Debug (Corregida para que sea fija y no se repita)
         debug_info = (
             f"ESTADO: {self.current_state.upper()} | "
             f"POS: {self.x()},{self.y()} | "
             f"SPRITE: {new_w}x{new_h} | "
             f"VEL: x:{self.vel_x:.1f}, y:{self.vel_y:.1f} | "
-            f"FÍSICAS: G:{self.gravity_factor} F:{self.friction} L:{self.launch_mult}"
+            f"G:{self.gravity_factor} F:{self.friction} L:{self.launch_mult}"
         )
-        sys.stdout.write(f"\r\033[K{debug_info}")
+        sys.stdout.write(f"\r\033[2K{debug_info}")
         sys.stdout.flush()
         
         self.current_frame = (self.current_frame + 1) % self.cols
@@ -190,8 +175,7 @@ class CyberPet(QMainWindow):
                 self.is_falling = True
                 self.change_state("fall")
             else:
-                self.vel_x = 0; self.vel_y = 0
-                self.change_state("idle")
+                self.vel_x = 0; self.vel_y = 0; self.change_state("idle")
 
     def update_scale(self):
         if self.is_dragging or self.is_falling: return self.locked_scale
