@@ -165,6 +165,7 @@ class CyberPet(QMainWindow):
             self.vel_y = (curr.y() - self.last_mouse_pos.y()) * self.launch_mult
             self.last_mouse_pos = curr
             self.move(curr - self.offset)
+            if self.y() > self.grab_y: self.grab_y = self.y()
             if self.current_state != "drag_mv": self.change_state("drag_mv")
 
     def mouseReleaseEvent(self, event):
@@ -178,7 +179,9 @@ class CyberPet(QMainWindow):
                 self.vel_x = 0; self.vel_y = 0; self.change_state("idle")
 
     def update_scale(self):
-        if self.is_dragging or self.is_falling: return self.locked_scale
+        if self.is_falling: return self.locked_scale
+        if self.is_dragging:
+            if self.y() < self.grab_y: return self.locked_scale
         env = self.config.get("environment", {})
         if env.get("mode") != "perspective": return self.base_height
         screen = QApplication.primaryScreen().availableGeometry()
