@@ -91,8 +91,22 @@ class CyberPet(QMainWindow):
             self.move(int(new_x), int(new_y))
             self.check_screen_bounds()
         elif not self.is_dragging:
+            # Si el estado actual es de mirada/movimiento, variamos Z
+            if self.current_state in ["look_l", "look_r"]:
+                self.grab_y += random.choice([-1, 0, 1]) * self.z_step
+                
+                # Límites: y_max debe dejar espacio para que el bicho se vea
+                env = self.config.get("environment", {})
+                scr = QApplication.primaryScreen().availableGeometry()
+                y_min = int((env.get("walkable_y_min_pc", 0) / 100) * scr.height())
+                y_max = int((env.get("walkable_y_max_pc", 100) / 100) * scr.height() - self.height())
+                
+                # Aplicar límites a grab_y
+                self.grab_y = max(y_min, min(self.grab_y, y_max))
+            
             self.check_screen_bounds()
-            self.move(int(self.x() + self.current_move_speed), self.y())
+            # Por ahora movemos a grab_y (aunque se hunda, queremos ver si respeta límites)
+            self.move(int(self.x() + self.current_move_speed), int(self.grab_y))
 
         # Renderizado (Lógica restaurada que funcionaba)
         new_h = self.update_scale()
@@ -204,7 +218,7 @@ class CyberPet(QMainWindow):
         if self.is_dragging or self.is_falling: return
         d = random.randint(1, 100)
         if d <= 40: self.change_state("idle")
-        elif d <= 85: self.change_state(random.choice(["look_l", "look_r"]))
+        elif d <= 85: self.change_state(random.choice(["look_l", "look_r", "walk_l", "walk_r"]))
         else: self.change_state("angry")
 
 if __name__ == "__main__":
