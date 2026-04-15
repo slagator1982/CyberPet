@@ -1,181 +1,190 @@
-<svg width="100%" viewBox="0 0 680 820" role="img" xmlns="http://www.w3.org/2000/svg">
-<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Arquitectura CyberPet</title>
-<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Diagrama de arquitectura del proyecto CyberPet mostrando clases, estados, sistemas y configuración</desc>
-<defs>
-  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-<mask id="imagine-text-gaps-aupveh" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="680" height="820" fill="white"/><rect x="252.90884399414062" y="12.792332649230957" width="174.18234252929688" height="23.552715301513672" fill="black" rx="2"/><rect x="64.56160736083984" y="56.79233169555664" width="120.87678527832031" height="23.552715301513672" fill="black" rx="2"/><rect x="64.42779541015625" y="76.96485900878906" width="121.14441680908203" height="20.656017303466797" fill="black" rx="2"/><rect x="63.20771789550781" y="92.96485900878906" width="123.5845718383789" height="20.656017303466797" fill="black" rx="2"/><rect x="493.1132507324219" y="56.79233169555664" width="123.77348327636719" height="23.552715301513672" fill="black" rx="2"/><rect x="499.536376953125" y="76.96485900878906" width="110.92726135253906" height="20.656017303466797" fill="black" rx="2"/><rect x="516.3262329101562" y="92.96485900878906" width="77.34759521484375" height="20.656017303466797" fill="black" rx="2"/><rect x="205.67987060546875" y="134.96485900878906" width="24.640274047851562" height="20.656017303466797" fill="black" rx="2"/><rect x="450.1993713378906" y="134.96485900878906" width="23.601240158081055" height="20.656017303466797" fill="black" rx="2"/><rect x="250.2404022216797" y="175.79232788085938" width="179.51918029785156" height="23.552715301513672" fill="black" rx="2"/><rect x="226.7126007080078" y="197.96485900878906" width="226.57479858398438" height="20.656017303466797" fill="black" rx="2"/><rect x="102.99958801269531" y="276.7923278808594" width="54.00083541870117" height="23.552715301513672" fill="black" rx="2"/><rect x="78.60591888427734" y="296.96484375" width="102.78816223144531" height="20.656017303466797" fill="black" rx="2"/><rect x="69.38843536376953" y="312.96484375" width="121.22313690185547" height="20.656017303466797" fill="black" rx="2"/><rect x="274.0594482421875" y="276.7923278808594" width="131.88108825683594" height="23.552715301513672" fill="black" rx="2"/><rect x="290.26678466796875" y="296.96484375" width="99.4664077758789" height="20.656017303466797" fill="black" rx="2"/><rect x="277.2316589355469" y="312.96484375" width="125.53669738769531" height="20.656017303466797" fill="black" rx="2"/><rect x="494.30810546875" y="276.7923278808594" width="111.38379669189453" height="23.552715301513672" fill="black" rx="2"/><rect x="488.77447509765625" y="296.96484375" width="122.45108032226562" height="20.656017303466797" fill="black" rx="2"/><rect x="489.38055419921875" y="312.96484375" width="121.23887634277344" height="20.656017303466797" fill="black" rx="2"/><rect x="273.87054443359375" y="362.96484375" width="132.25892639160156" height="20.656017303466797" fill="black" rx="2"/><rect x="112.8331298828125" y="396.7923278808594" width="144.333740234375" height="23.552715301513672" fill="black" rx="2"/><rect x="123.12113189697266" y="416.96484375" width="123.75774383544922" height="20.656017303466797" fill="black" rx="2"/><rect x="138.2973175048828" y="432.96484375" width="93.40538024902344" height="20.656017303466797" fill="black" rx="2"/><rect x="428.0204162597656" y="396.7923278808594" width="133.95916748046875" height="23.552715301513672" fill="black" rx="2"/><rect x="462.51318359375" y="416.96484375" width="64.97365188598633" height="20.656017303466797" fill="black" rx="2"/><rect x="438.4343566894531" y="432.96484375" width="113.13127136230469" height="20.656017303466797" fill="black" rx="2"/><rect x="115.05126190185547" y="504.7923278808594" width="129.8974838256836" height="23.552715301513672" fill="black" rx="2"/><rect x="107.99842834472656" y="524.96484375" width="144.00315856933594" height="20.656017303466797" fill="black" rx="2"/><rect x="92.38932037353516" y="540.96484375" width="175.22137451171875" height="20.656017303466797" fill="black" rx="2"/><rect x="97.4821548461914" y="556.96484375" width="165.0356903076172" height="20.656017303466797" fill="black" rx="2"/><rect x="447.44720458984375" y="504.7923278808594" width="95.1056137084961" height="23.552715301513672" fill="black" rx="2"/><rect x="438.7492370605469" y="524.96484375" width="112.50154876708984" height="20.656017303466797" fill="black" rx="2"/><rect x="414.6389465332031" y="540.96484375" width="160.72213745117188" height="20.656017303466797" fill="black" rx="2"/><rect x="412.1121826171875" y="556.96484375" width="165.77561950683594" height="20.656017303466797" fill="black" rx="2"/><rect x="260.4811706542969" y="600.96484375" width="159.0376434326172" height="20.656017303466797" fill="black" rx="2"/><rect x="58.727882385253906" y="632.7923583984375" width="126.54424285888672" height="23.552715301513672" fill="black" rx="2"/><rect x="69.13395690917969" y="652.96484375" width="105.73209381103516" height="20.656017303466797" fill="black" rx="2"/><rect x="74.7305679321289" y="668.96484375" width="94.53887176513672" height="20.656017303466797" fill="black" rx="2"/><rect x="276.36578369140625" y="632.7923583984375" width="127.26841735839844" height="23.552715301513672" fill="black" rx="2"/><rect x="287.31500244140625" y="652.96484375" width="105.37000274658203" height="20.656017303466797" fill="black" rx="2"/><rect x="289.3222351074219" y="668.96484375" width="101.35556030273438" height="20.656017303466797" fill="black" rx="2"/><rect x="484.8642883300781" y="632.7923583984375" width="142.27142333984375" height="23.552715301513672" fill="black" rx="2"/><rect x="515.9801635742188" y="652.96484375" width="80.03963470458984" height="20.656017303466797" fill="black" rx="2"/><rect x="494.735107421875" y="668.96484375" width="122.52979278564453" height="20.656017303466797" fill="black" rx="2"/><rect x="267.3450927734375" y="710.96484375" width="145.309814453125" height="20.656017303466797" fill="black" rx="2"/><rect x="65.87007141113281" y="747.7923583984375" width="32.259849548339844" height="23.552715301513672" fill="black" rx="2"/><rect x="158.07107543945312" y="747.7923583984375" width="57.85784912109375" height="23.552715301513672" fill="black" rx="2"/><rect x="261.9690856933594" y="747.7923583984375" width="60.061859130859375" height="23.552715301513672" fill="black" rx="2"/><rect x="373.6204528808594" y="747.7923583984375" width="46.75908660888672" height="23.552715301513672" fill="black" rx="2"/><rect x="460.224853515625" y="747.7923583984375" width="83.55030059814453" height="23.552715301513672" fill="black" rx="2"/><rect x="582.7198486328125" y="747.7923583984375" width="28.56026268005371" height="23.552715301513672" fill="black" rx="2"/><rect x="331.9506530761719" y="602.96484375" width="92.09871673583984" height="20.656017303466797" fill="black" rx="2"/></mask></defs>
+<svg viewBox="0 0 900 640" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
 
-<!-- TÍTULO -->
-<text x="340" y="30" text-anchor="middle" font-size="16" style="fill:rgb(250, 249, 245);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">Arquitectura — CyberPet</text>
+  <!-- Fondo -->
+  <rect width="900" height="640" fill="#0f1117" rx="12"/>
 
-<!-- ══════════════════════════════════════ -->
-<!-- BLOQUE: config.json (skin) -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="50" width="170" height="76" rx="8" stroke-width="0.5" style="fill:rgb(99, 56, 6);stroke:rgb(239, 159, 39);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="125" y="74" text-anchor="middle" style="fill:rgb(250, 199, 117);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">config.json (skin)</text>
-  <text x="125" y="92" text-anchor="middle" style="fill:rgb(239, 159, 39);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">base_height, gravity</text>
-  <text x="125" y="108" text-anchor="middle" style="fill:rgb(239, 159, 39);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">friction, launch_mult</text>
-</g>
+  <!-- Título -->
+  <text x="450" y="38" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" letter-spacing="2">CyberPet — Arquitectura de módulos v2</text>
 
-<!-- BLOQUE: config.json (data) -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="470" y="50" width="170" height="76" rx="8" stroke-width="0.5" style="fill:rgb(99, 56, 6);stroke:rgb(239, 159, 39);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="555" y="74" text-anchor="middle" style="fill:rgb(250, 199, 117);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">config.json (data)</text>
-  <text x="555" y="92" text-anchor="middle" style="fill:rgb(239, 159, 39);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">pet_name, opacity</text>
-  <text x="555" y="108" text-anchor="middle" style="fill:rgb(239, 159, 39);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">current_skin</text>
-</g>
+  <!-- ══════════════════════════════════════════════
+       CAPA: Qt / Sistema operativo
+  ══════════════════════════════════════════════ -->
+  <rect x="30" y="58" width="840" height="68" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+  <text x="50" y="78" fill="#64748b" font-size="10" font-weight="600" letter-spacing="1.5">CAPA  Qt + SO</text>
 
-<!-- FLECHA config → CyberPet -->
-<line x1="210" y1="88" x2="250" y2="180" marker-end="url(#arrow)" stroke="#BA7517" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="470" y1="88" x2="430" y2="180" marker-end="url(#arrow)" stroke="#BA7517" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="218" y="150" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">lee</text>
-<text x="462" y="150" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">ref</text>
+  <!-- Nodos Qt -->
+  <rect x="50"  y="84" width="110" height="32" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="105" y="104" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">QMainWindow</text>
 
-<!-- ══════════════════════════════════════ -->
-<!-- BLOQUE PRINCIPAL: clase CyberPet -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="180" y="170" width="320" height="56" rx="8" stroke-width="0.5" style="fill:rgb(60, 52, 137);stroke:rgb(175, 169, 236);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="340" y="193" text-anchor="middle" style="fill:rgb(206, 203, 246);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">CyberPet (QMainWindow)</text>
-  <text x="340" y="213" text-anchor="middle" style="fill:rgb(175, 169, 236);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Ventana transparente, siempre encima</text>
-</g>
+  <rect x="180" y="84" width="100" height="32" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="230" y="104" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">QTimer × 2</text>
 
-<!-- ══════════════════════════════════════ -->
-<!-- BLOQUE: __init__ -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="270" width="180" height="76" rx="8" stroke-width="0.5" style="fill:rgb(12, 68, 124);stroke:rgb(133, 183, 235);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="130" y="294" text-anchor="middle" style="fill:rgb(181, 212, 244);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">__init__</text>
-  <text x="130" y="312" text-anchor="middle" style="fill:rgb(133, 183, 235);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Carga config, fija</text>
-  <text x="130" y="328" text-anchor="middle" style="fill:rgb(133, 183, 235);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">canvas, inicia timers</text>
-</g>
+  <rect x="300" y="84" width="100" height="32" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="350" y="104" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">QLabel (canvas)</text>
 
-<!-- BLOQUE: set_initial_position -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="250" y="270" width="180" height="76" rx="8" stroke-width="0.5" style="fill:rgb(12, 68, 124);stroke:rgb(133, 183, 235);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="340" y="294" text-anchor="middle" style="fill:rgb(181, 212, 244);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">set_initial_position</text>
-  <text x="340" y="312" text-anchor="middle" style="fill:rgb(133, 183, 235);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Posiciona según</text>
-  <text x="340" y="328" text-anchor="middle" style="fill:rgb(133, 183, 235);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">start_x/y_pc + grab_y</text>
-</g>
+  <rect x="420" y="84" width="110" height="32" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="475" y="104" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">Mouse Events</text>
 
-<!-- BLOQUE: load_animation -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="460" y="270" width="180" height="76" rx="8" stroke-width="0.5" style="fill:rgb(12, 68, 124);stroke:rgb(133, 183, 235);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="550" y="294" text-anchor="middle" style="fill:rgb(181, 212, 244);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">load_animation</text>
-  <text x="550" y="312" text-anchor="middle" style="fill:rgb(133, 183, 235);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">Lee spritesheet, cols</text>
-  <text x="550" y="328" text-anchor="middle" style="fill:rgb(133, 183, 235);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">velocidad de frames</text>
-</g>
+  <rect x="550" y="84" width="110" height="32" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="605" y="104" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">QApplication</text>
 
-<!-- Flechas __init__ → sub -->
-<line x1="280" y1="226" x2="180" y2="270" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="340" y1="226" x2="340" y2="270" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="400" y1="226" x2="490" y2="270" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <rect x="680" y="84" width="160" height="32" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="760" y="104" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600">availableGeometry()</text>
 
-<!-- ══════════════════════════════════════ -->
-<!-- SECCIÓN: TIMERS -->
-<text x="340" y="378" text-anchor="middle" font-style="italic" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;font-style:italic;text-anchor:middle;dominant-baseline:auto">— bucles principales —</text>
+  <!-- ══════════════════════════════════════════════
+       CAPA: main.py — Coordinador
+  ══════════════════════════════════════════════ -->
+  <rect x="30" y="148" width="840" height="80" rx="8" fill="#1a1f2e" stroke="#4f46e5" stroke-width="2"/>
+  <text x="50"  y="168" fill="#818cf8" font-size="10" font-weight="600" letter-spacing="1.5">COORDINADOR</text>
+  <text x="450" y="168" text-anchor="middle" fill="#c7d2fe" font-size="10" fill-opacity="0.6">main.py</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="80" y="390" width="210" height="66" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="185" y="414" text-anchor="middle" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">anim_timer (150 ms)</text>
-  <text x="185" y="432" text-anchor="middle" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ update_animation</text>
-  <text x="185" y="448" text-anchor="middle" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">físicas + render</text>
-</g>
+  <!-- main.py box -->
+  <rect x="300" y="175" width="300" height="42" rx="8" fill="#312e81" stroke="#6366f1" stroke-width="2"/>
+  <text x="450" y="191" text-anchor="middle" fill="#e0e7ff" font-size="13" font-weight="700">CyberPet</text>
+  <text x="450" y="208" text-anchor="middle" fill="#a5b4fc" font-size="10">update_animation() · change_state()</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="390" y="390" width="210" height="66" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="495" y="414" text-anchor="middle" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">ai_timer (4 000 ms)</text>
-  <text x="495" y="432" text-anchor="middle" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ ai_think</text>
-  <text x="495" y="448" text-anchor="middle" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">decisión de estado</text>
-</g>
+  <!-- Flecha: Qt → CyberPet -->
+  <line x1="160" y1="116" x2="350" y2="175" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+  <line x1="450" y1="116" x2="450" y2="175" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+  <line x1="605" y1="116" x2="550" y2="175" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
 
-<line x1="250" y1="346" x2="200" y2="390" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="420" y1="346" x2="460" y2="390" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- ══════════════════════════════════════════════
+       CAPA: Módulos de lógica (sin Qt)
+  ══════════════════════════════════════════════ -->
+  <rect x="30" y="258" width="840" height="230" rx="8" fill="#111827" stroke="#374151" stroke-width="1.2"/>
+  <text x="50" y="278" fill="#6b7280" font-size="10" font-weight="600" letter-spacing="1.5">MÓDULOS DE LÓGICA  (sin dependencia Qt)</text>
 
-<!-- ══════════════════════════════════════ -->
-<!-- update_animation detalle -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="500" width="280" height="86" rx="8" stroke-width="0.5" style="fill:rgb(113, 43, 19);stroke:rgb(240, 153, 123);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="180" y="522" text-anchor="middle" style="fill:rgb(245, 196, 179);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">update_animation</text>
-  <text x="180" y="540" text-anchor="middle" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">1. Física: vel_y += gravity</text>
-  <text x="180" y="556" text-anchor="middle" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">2. Perspectiva: grab_y ±z_step</text>
-  <text x="180" y="572" text-anchor="middle" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">3. Render spritesheet frame</text>
-</g>
+  <!-- physics.py -->
+  <rect x="50"  y="288" width="175" height="185" rx="8" fill="#14281a" stroke="#22c55e" stroke-width="1.8"/>
+  <text x="137" y="308" text-anchor="middle" fill="#86efac" font-size="12" font-weight="700">physics.py</text>
+  <text x="137" y="323" text-anchor="middle" fill="#4ade80" font-size="9">PhysicsEngine</text>
+  <line x1="70" y1="329" x2="207" y2="329" stroke="#166534" stroke-width="0.8"/>
+  <text x="62"  y="344" fill="#86efac" font-size="9">▸ tick_fall()</text>
+  <text x="62"  y="358" fill="#86efac" font-size="9">▸ tick_autonomous()</text>
+  <text x="62"  y="372" fill="#86efac" font-size="9">▸ start_drag()</text>
+  <text x="62"  y="386" fill="#86efac" font-size="9">▸ update_drag_velocity()</text>
+  <text x="62"  y="400" fill="#86efac" font-size="9">▸ update_grab_y_on_drag()</text>
+  <text x="62"  y="414" fill="#86efac" font-size="9">▸ release_drag()</text>
+  <text x="62"  y="428" fill="#86efac" font-size="9">▸ bounce_horizontal()</text>
+  <text x="62"  y="442" fill="#86efac" font-size="9">▸ set_gravity()</text>
+  <line x1="70" y1="450" x2="207" y2="450" stroke="#166534" stroke-width="0.8"/>
+  <text x="62"  y="464" fill="#4ade80" font-size="8.5">vel_x · vel_y · grab_y</text>
 
-<!-- update_scale -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="360" y="500" width="270" height="86" rx="8" stroke-width="0.5" style="fill:rgb(113, 43, 19);stroke:rgb(240, 153, 123);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="495" y="522" text-anchor="middle" style="fill:rgb(245, 196, 179);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">update_scale</text>
-  <text x="495" y="540" text-anchor="middle" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">modo perspective:</text>
-  <text x="495" y="556" text-anchor="middle" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">t = (grab_y − y_min) / rango</text>
-  <text x="495" y="572" text-anchor="middle" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">height = base_h × (min_f + t)</text>
-</g>
+  <!-- perspective.py -->
+  <rect x="245" y="288" width="175" height="185" rx="8" fill="#1a1f14" stroke="#eab308" stroke-width="1.8"/>
+  <text x="332" y="308" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="700">perspective.py</text>
+  <text x="332" y="323" text-anchor="middle" fill="#fbbf24" font-size="9">PerspectiveSystem</text>
+  <line x1="265" y1="329" x2="402" y2="329" stroke="#713f12" stroke-width="0.8"/>
+  <text x="257" y="344" fill="#fde68a" font-size="9">▸ compute_scale()</text>
+  <text x="257" y="358" fill="#fde68a" font-size="9">▸ walkable_bounds()</text>
+  <line x1="265" y1="370" x2="402" y2="370" stroke="#713f12" stroke-width="0.8"/>
+  <text x="257" y="385" fill="#fbbf24" font-size="8.5">Fórmula:</text>
+  <text x="257" y="399" fill="#fbbf24" font-size="8.5">t = (grab_y−y_min)</text>
+  <text x="257" y="413" fill="#fbbf24" font-size="8.5">    ÷ (y_max−y_min)</text>
+  <text x="257" y="427" fill="#fbbf24" font-size="8.5">h = base_h × (min_f</text>
+  <text x="257" y="441" fill="#fbbf24" font-size="8.5">    + t×(1−min_f))</text>
+  <line x1="265" y1="452" x2="402" y2="452" stroke="#713f12" stroke-width="0.8"/>
+  <text x="257" y="466" fill="#fbbf24" font-size="8.5">locked_scale (drag/fall)</text>
 
-<line x1="185" y1="456" x2="185" y2="500" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="320" y1="543" x2="360" y2="543" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- renderer.py -->
+  <rect x="440" y="288" width="175" height="185" rx="8" fill="#1a1428" stroke="#a855f7" stroke-width="1.8"/>
+  <text x="527" y="308" text-anchor="middle" fill="#d8b4fe" font-size="12" font-weight="700">renderer.py</text>
+  <text x="527" y="323" text-anchor="middle" fill="#c084fc" font-size="9">SpriteRenderer</text>
+  <line x1="460" y1="329" x2="597" y2="329" stroke="#581c87" stroke-width="0.8"/>
+  <text x="452" y="344" fill="#d8b4fe" font-size="9">▸ load_sheet()</text>
+  <text x="452" y="358" fill="#d8b4fe" font-size="9">▸ render_frame()</text>
+  <line x1="460" y1="368" x2="597" y2="368" stroke="#581c87" stroke-width="0.8"/>
+  <text x="452" y="383" fill="#c084fc" font-size="8.5">1. Recorta frame actual</text>
+  <text x="452" y="397" fill="#c084fc" font-size="8.5">2. Escala suave</text>
+  <text x="452" y="411" fill="#c084fc" font-size="8.5">3. Centra en canvas</text>
+  <text x="452" y="425" fill="#c084fc" font-size="8.5">4. Avanza frame</text>
+  <line x1="460" y1="436" x2="597" y2="436" stroke="#581c87" stroke-width="0.8"/>
+  <text x="452" y="451" fill="#d8b4fe" font-size="8.5">⚠ Usa PyQt6 (QPixmap)</text>
+  <text x="452" y="465" fill="#d8b4fe" font-size="8.5">real_sprite_size → colisión</text>
 
-<!-- ══════════════════════════════════════ -->
-<!-- EVENTOS MOUSE -->
-<text x="340" y="616" text-anchor="middle" font-style="italic" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;font-style:italic;text-anchor:middle;dominant-baseline:auto">— interacción del usuario —</text>
+  <!-- ai.py -->
+  <rect x="635" y="288" width="135" height="110" rx="8" fill="#1a1414" stroke="#ef4444" stroke-width="1.8"/>
+  <text x="702" y="308" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="700">ai.py</text>
+  <text x="702" y="323" text-anchor="middle" fill="#f87171" font-size="9">AIBrain</text>
+  <line x1="655" y1="329" x2="752" y2="329" stroke="#7f1d1d" stroke-width="0.8"/>
+  <text x="647" y="344" fill="#fca5a5" font-size="9">▸ think()</text>
+  <line x1="655" y1="352" x2="752" y2="352" stroke="#7f1d1d" stroke-width="0.8"/>
+  <text x="647" y="367" fill="#f87171" font-size="8.5">idle       40%</text>
+  <text x="647" y="381" fill="#f87171" font-size="8.5">walk/look  45%</text>
+  <text x="647" y="395" fill="#f87171" font-size="8.5">angry      15%</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="628" width="165" height="66" rx="8" stroke-width="0.5" style="fill:rgb(114, 36, 62);stroke:rgb(237, 147, 177);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="122" y="650" text-anchor="middle" style="fill:rgb(244, 192, 209);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">mousePressEvent</text>
-  <text x="122" y="668" text-anchor="middle" style="fill:rgb(237, 147, 177);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">is_dragging=True</text>
-  <text x="122" y="684" text-anchor="middle" style="fill:rgb(237, 147, 177);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">estado: drag_id</text>
-</g>
+  <!-- debug.py -->
+  <rect x="635" y="415" width="135" height="73" rx="8" fill="#141414" stroke="#6b7280" stroke-width="1.8"/>
+  <text x="702" y="435" text-anchor="middle" fill="#d1d5db" font-size="12" font-weight="700">debug.py</text>
+  <text x="702" y="450" text-anchor="middle" fill="#9ca3af" font-size="9">DebugHUD</text>
+  <line x1="655" y1="456" x2="752" y2="456" stroke="#374151" stroke-width="0.8"/>
+  <text x="647" y="471" fill="#d1d5db" font-size="9">▸ print()</text>
+  <text x="647" y="484" fill="#9ca3af" font-size="8.5">ANSI in-place</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="257" y="628" width="165" height="66" rx="8" stroke-width="0.5" style="fill:rgb(114, 36, 62);stroke:rgb(237, 147, 177);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="340" y="650" text-anchor="middle" style="fill:rgb(244, 192, 209);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">mouseMoveEvent</text>
-  <text x="340" y="668" text-anchor="middle" style="fill:rgb(237, 147, 177);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">vel_x/y = Δmouse</text>
-  <text x="340" y="684" text-anchor="middle" style="fill:rgb(237, 147, 177);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">estado: drag_mv</text>
-</g>
+  <!-- ══════════════════════════════════════════════
+       CAPA: Assets / Disco
+  ══════════════════════════════════════════════ -->
+  <rect x="30" y="515" width="840" height="60" rx="8" fill="#0f1721" stroke="#334155" stroke-width="1.2"/>
+  <text x="50" y="535" fill="#475569" font-size="10" font-weight="600" letter-spacing="1.5">ASSETS  (disco)</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="474" y="628" width="165" height="66" rx="8" stroke-width="0.5" style="fill:rgb(114, 36, 62);stroke:rgb(237, 147, 177);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="556" y="650" text-anchor="middle" style="fill:rgb(244, 192, 209);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">mouseReleaseEvent</text>
-  <text x="556" y="668" text-anchor="middle" style="fill:rgb(237, 147, 177);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">si y &lt; grab_y:</text>
-  <text x="556" y="684" text-anchor="middle" style="fill:rgb(237, 147, 177);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">is_falling=True → fall</text>
-</g>
+  <rect x="110" y="541" width="180" height="26" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+  <text x="200" y="558" text-anchor="middle" fill="#94a3b8" font-size="10">config.json (skin)</text>
 
-<!-- flechas mouse → update -->
-<line x1="122" y1="628" x2="122" y2="586" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="340" y1="628" x2="300" y2="586" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-aupveh)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="556" y1="628" x2="450" y2="586" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <rect x="310" y="541" width="180" height="26" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+  <text x="400" y="558" text-anchor="middle" fill="#94a3b8" font-size="10">*.png (spritesheets)</text>
 
-<!-- ══════════════════════════════════════ -->
-<!-- MAQUINA DE ESTADOS -->
-<text x="340" y="726" text-anchor="middle" font-style="italic" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;font-style:italic;text-anchor:middle;dominant-baseline:auto">— máquina de estados —</text>
+  <rect x="510" y="541" width="200" height="26" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+  <text x="610" y="558" text-anchor="middle" fill="#94a3b8" font-size="10">data/config.json (global)</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="738" width="85" height="44" rx="8" stroke-width="0.5" style="fill:rgb(68, 68, 65);stroke:rgb(180, 178, 169);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="82" y="765" text-anchor="middle" style="fill:rgb(211, 209, 199);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">idle</text>
-</g>
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="145" y="738" width="85" height="44" rx="8" stroke-width="0.5" style="fill:rgb(68, 68, 65);stroke:rgb(180, 178, 169);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="187" y="765" text-anchor="middle" style="fill:rgb(211, 209, 199);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">look_l/r</text>
-</g>
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="250" y="738" width="85" height="44" rx="8" stroke-width="0.5" style="fill:rgb(68, 68, 65);stroke:rgb(180, 178, 169);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="292" y="765" text-anchor="middle" style="fill:rgb(211, 209, 199);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">walk_l/r</text>
-</g>
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="355" y="738" width="85" height="44" rx="8" stroke-width="0.5" style="fill:rgb(68, 68, 65);stroke:rgb(180, 178, 169);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="397" y="765" text-anchor="middle" style="fill:rgb(211, 209, 199);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">angry</text>
-</g>
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="460" y="738" width="85" height="44" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="502" y="765" text-anchor="middle" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">drag_id/mv</text>
-</g>
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="555" y="738" width="85" height="44" rx="8" stroke-width="0.5" style="fill:rgb(113, 43, 19);stroke:rgb(240, 153, 123);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="597" y="765" text-anchor="middle" style="fill:rgb(245, 196, 179);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:auto">fall</text>
-</g>
+  <!-- ══════════════════════════════════════════════
+       Flechas: CyberPet → módulos
+  ══════════════════════════════════════════════ -->
+  <!-- CyberPet → physics -->
+  <line x1="380" y1="217" x2="137" y2="288" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-green)"/>
+  <!-- CyberPet → perspective -->
+  <line x1="420" y1="217" x2="332" y2="288" stroke="#eab308" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-yellow)"/>
+  <!-- CyberPet → renderer -->
+  <line x1="490" y1="217" x2="527" y2="288" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <!-- CyberPet → ai -->
+  <line x1="540" y1="210" x2="680" y2="288" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
+  <!-- CyberPet → debug -->
+  <line x1="560" y1="217" x2="702" y2="415" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
 
-<!-- flechas ai_think → estados AI -->
-<line x1="495" y1="456" x2="187" y2="738" marker-end="url(#arrow)" stroke="#0F6E56" mask="url(#imagine-text-gaps-aupveh)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="495" y1="456" x2="292" y2="738" marker-end="url(#arrow)" stroke="#0F6E56" mask="url(#imagine-text-gaps-aupveh)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="495" y1="456" x2="397" y2="738" marker-end="url(#arrow)" stroke="#0F6E56" mask="url(#imagine-text-gaps-aupveh)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(251, 251, 254);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="378" y="618" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">ai_think decide</text>
+  <!-- Flechas: módulos → assets -->
+  <line x1="137" y1="473" x2="200" y2="541" stroke="#22c55e" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arr-green)"/>
+  <line x1="527" y1="473" x2="400" y2="541" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arr-purple)"/>
+  <line x1="527" y1="473" x2="610" y2="541" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Etiqueta relación ai → CyberPet (callback) -->
+  <text x="590" y="248" fill="#f87171" font-size="8" font-style="italic">callback on_state_change</text>
+  <line x1="660" y1="252" x2="600" y2="220" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="3,2" marker-end="url(#arr-red)"/>
+
+  <!-- ══════════════════════════════════════════════
+       Leyenda
+  ══════════════════════════════════════════════ -->
+  <rect x="30" y="596" width="840" height="32" rx="6" fill="#0f1117"/>
+  <line x1="50"  y1="614" x2="80"  y2="614" stroke="#4f46e5" stroke-width="2"/>
+  <text x="85"  y="618" fill="#818cf8" font-size="9">Coordinación Qt</text>
+  <line x1="185" y1="614" x2="215" y2="614" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="220" y="618" fill="#86efac" font-size="9">Física</text>
+  <line x1="265" y1="614" x2="295" y2="614" stroke="#eab308" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="300" y="618" fill="#fde68a" font-size="9">Perspectiva</text>
+  <line x1="375" y1="614" x2="405" y2="614" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="410" y="618" fill="#d8b4fe" font-size="9">Renderer</text>
+  <line x1="475" y1="614" x2="505" y2="614" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="510" y="618" fill="#fca5a5" font-size="9">IA</text>
+  <line x1="535" y1="614" x2="565" y2="614" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="570" y="618" fill="#d1d5db" font-size="9">Debug</text>
+  <line x1="615" y1="614" x2="645" y2="614" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="650" y="618" fill="#93c5fd" font-size="9">Eventos Qt → Coordinador</text>
+
+  <!-- Marcadores de flecha -->
+  <defs>
+    <marker id="arr-blue"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/></marker>
+    <marker id="arr-green"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#22c55e"/></marker>
+    <marker id="arr-yellow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#eab308"/></marker>
+    <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#a855f7"/></marker>
+    <marker id="arr-red"    markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ef4444"/></marker>
+    <marker id="arr-gray"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/></marker>
+  </defs>
 </svg>

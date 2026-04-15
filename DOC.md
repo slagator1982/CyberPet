@@ -1,4 +1,4 @@
-# CyberPet — Documentación técnica
+# CyberPet — Documentación técnica (v2)
 
 ## Descripción general
 
@@ -11,23 +11,45 @@ CyberPet es una mascota virtual de escritorio construida con **Python + PyQt6**.
 ```
 Archivador/
 ├── src/
-│   └── main.py              # Código fuente principal
+│   ├── main.py          # Coordinador principal (CyberPet + punto de entrada)
+│   ├── physics.py       # Motor de física (gravedad, fricción, drag, rebotes)
+│   ├── perspective.py   # Sistema de perspectiva simulada (eje Z)
+│   ├── renderer.py      # Carga de spritesheets y composición de frames
+│   ├── ai.py            # Inteligencia artificial autónoma
+│   └── debug.py         # HUD de debug en consola (in-place)
 ├── assets/
 │   └── skins/
 │       └── default/
 │           ├── config.json  # Configuración del skin (física + animaciones)
 │           └── *.png        # Spritesheets de cada estado
 └── data/
-    └── config.json          # Configuración global de la mascota
+    └── config.json          # Configuración global (referencial)
 ```
+
+---
+
+## Arquitectura de módulos
+
+La lógica que antes residía en un único archivo (`main.py`) está ahora repartida en módulos con responsabilidades bien definidas. La clase `CyberPet` en `main.py` actúa como **coordinador**: recibe eventos de Qt y delega la lógica en los subsistemas.
+
+```
+main.py (CyberPet)
+    ├── physics.py      → PhysicsEngine
+    ├── perspective.py  → PerspectiveSystem
+    ├── renderer.py     → SpriteRenderer
+    ├── ai.py           → AIBrain
+    └── debug.py        → DebugHUD
+```
+
+### Regla de dependencias
+
+Los módulos de lógica pura (`physics`, `perspective`, `ai`, `debug`) **no importan Qt**. Solo `main.py` y `renderer.py` dependen de PyQt6, lo que facilita el testing unitario de la lógica sin necesidad de un entorno gráfico.
 
 ---
 
 ## Archivos de configuración
 
 ### `assets/skins/default/config.json` — Configuración del skin
-
-Este es el archivo más importante. Controla toda la física, el entorno y las animaciones.
 
 | Clave | Tipo | Valor por defecto | Descripción |
 |---|---|---|---|
@@ -42,18 +64,14 @@ Este es el archivo más importante. Controla toda la física, el entorno y las a
 
 #### Subsección `environment`
 
-Controla el sistema de perspectiva simulada.
-
 | Clave | Tipo | Descripción |
 |---|---|---|
-| `mode` | string | `"perspective"` activa el escalado por profundidad; cualquier otro valor lo desactiva |
-| `min_scale_percent` | int | Porcentaje mínimo de `base_height` cuando el personaje está al fondo (10 = 10%) |
+| `mode` | string | `"perspective"` activa el escalado por profundidad |
+| `min_scale_percent` | int | Porcentaje mínimo de `base_height` cuando el personaje está al fondo |
 | `walkable_y_min_pc` | int | Límite superior del área caminable (% del alto de pantalla) |
 | `walkable_y_max_pc` | int | Límite inferior del área caminable (% del alto de pantalla) |
 
 #### Subsección `animations`
-
-Cada estado tiene una entrada con la siguiente estructura:
 
 ```json
 "nombre_estado": {
@@ -66,7 +84,7 @@ Cada estado tiene una entrada con la siguiente estructura:
 
 | Clave | Descripción |
 |---|---|
-| `file` | Nombre del archivo PNG dentro de la carpeta del skin |
+| `file` | Nombre del PNG dentro de la carpeta del skin |
 | `cols` | Número de columnas (frames) en el spritesheet horizontal |
 | `speed` | Milisegundos entre frames |
 | `move_speed` | Píxeles por tick que se desplaza en X (negativo = izquierda) |
@@ -84,184 +102,107 @@ Cada estado tiene una entrada con la siguiente estructura:
 | `drag_mv` | Personaje siendo arrastrado activamente |
 | `fall` | Personaje en caída libre tras ser lanzado |
 
-### `data/config.json` — Configuración global
-
-Actualmente es referencial. Los campos `pet_name`, `opacity`, `always_on_top` y `current_skin` están definidos aquí pero el código lee directamente la carpeta del skin.
-
 ---
 
-## Clase principal: `CyberPet`
+## Módulo `physics.py` — PhysicsEngine
 
-Hereda de `QMainWindow`. La ventana tiene tres flags de Qt:
-- `FramelessWindowHint` — sin barra de título ni bordes
-- `WindowStaysOnTopHint` — siempre encima de otras ventanas
-- `Tool` — no aparece en la barra de tareas
-- `WA_TranslucentBackground` — fondo transparente
+Encapsula todo el estado físico del personaje. No conoce Qt ni renderizado.
 
-### Variables de instancia
+### Variables de estado
 
-#### Posición y física
+| Variable | Tipo | Descripción |
+|---|---|---|
+| `vel_x` | float | Velocidad horizontal actual (px/tick) |
+| `vel_y` | float | Velocidad vertical actual (px/tick) |
+| `is_falling` | bool | True mientras el personaje está en caída libre |
+| `is_dragging` | bool | True mientras el usuario arrastra |
+| `grab_y` | float | Coordenada Y del suelo actual. El personaje aterriza cuando `y >= grab_y` |
+| `gravity_factor` | float | Aceleración por tick (px/tick²); puede sobreescribirse por animación |
+| `friction` | float | Factor de fricción horizontal en caída (0–1) |
+| `launch_mult` | float | Multiplicador de velocidad al soltar el drag |
+| `z_step` | float | Variación máxima de grab_y por tick (profundidad) |
 
-| Variable | Tipo | Inicialización | Descripción |
-|---|---|---|---|
-| `grab_y` | float | `set_initial_position()` | Posición Y del "suelo" actual del personaje. Todo lo que esté por encima se considera "aire". Es la referencia de la gravedad. |
-| `vel_x` | float | 0.0 | Velocidad horizontal en píxeles/tick |
-| `vel_y` | float | 0.0 | Velocidad vertical en píxeles/tick |
-| `is_falling` | bool | False | True cuando el personaje está en caída libre |
-| `is_dragging` | bool | False | True mientras el usuario arrastra |
-| `last_mouse_pos` | QPoint | (0,0) | Posición del ratón en el tick anterior (para calcular velocidad) |
-| `offset` | QPoint | set en mousePressEvent | Offset del click respecto a la esquina de la ventana |
+### Métodos principales
 
-#### Configuración de física (leídas del JSON)
-
-| Variable | Descripción |
+| Método | Descripción |
 |---|---|
-| `base_height` | Altura base del sprite en píxeles |
-| `launch_mult` | Multiplicador de velocidad al lanzar |
-| `friction` | Factor de fricción horizontal en caída (0-1) |
-| `gravity_factor` | Aceleración gravitatoria por tick |
-| `z_step` | Paso de variación Z por tick |
-
-#### Renderizado
-
-| Variable | Descripción |
-|---|---|
-| `locked_scale` | Escala fijada en el momento del drag (no varía mientras se arrastra) |
-| `canvas_size_val` | Tamaño del canvas (= `base_height × 2`) |
-| `real_sprite_size` | QSize con el tamaño real del sprite escalado en el tick actual |
-| `full_sheet` | QPixmap con el spritesheet completo del estado actual |
-| `frame_w` / `frame_h` | Dimensiones de un frame individual del spritesheet |
-| `cols` | Número de columnas del spritesheet actual |
-| `current_frame` | Índice del frame que se está mostrando |
-
-#### Estado de la IA
-
-| Variable | Descripción |
-|---|---|
-| `current_state` | String con el nombre del estado actual |
-| `current_move_speed` | Velocidad X de movimiento autónomo (del JSON de la animación) |
+| `tick_fall(x, y)` | Aplica gravedad y fricción; devuelve `(new_x, new_y, landed)` |
+| `tick_autonomous(x, speed, state, y_min, y_max)` | Movimiento autónomo con variación Z; devuelve `(new_x, new_grab_y)` |
+| `start_drag(locked_y)` | Inicializa el estado de arrastre |
+| `update_drag_velocity(dx, dy)` | Actualiza velocidad durante el drag |
+| `update_grab_y_on_drag(window_y)` | Actualiza el suelo si el personaje desciende durante el drag |
+| `release_drag()` | Finaliza el drag; devuelve `True` si debe iniciar caída |
+| `bounce_horizontal(direction)` | Invierte y amortigua vel_x al rebotar en un borde |
+| `set_gravity(value)` | Actualiza gravity_factor (llamado por cada animación) |
 
 ---
 
-## Inicialización del personaje
+## Módulo `perspective.py` — PerspectiveSystem
 
-El flujo de `__init__` sigue este orden:
+Calcula la altura visual del sprite en función de su posición Y.
 
-1. Se configura la ventana Qt (transparente, sin bordes, siempre encima).
-2. Se crea un `QLabel` interno que actúa como lienzo de píxeles.
-3. Se lee `config.json` del skin. Si falla, el proceso termina.
-4. Se cargan las variables de física desde el JSON.
-5. Se calcula el tamaño del canvas: `canvas_size_val = base_height × 2`.
-6. Se llama a `load_animation("idle")` para cargar el primer spritesheet.
-7. Se llama a `set_initial_position()` para colocar la ventana.
-8. Se arrancan los dos timers (`anim_timer` y `ai_timer`).
-9. Se hace visible la ventana (`show()`).
-
-### `set_initial_position()`
-
-Lee `start_x_pc` y `start_y_pc` del JSON (con defaults del 50% y 90%) y posiciona la ventana centrando el canvas en esas coordenadas. Al finalizar, `grab_y` queda igual que `self.y()`, estableciendo el suelo inicial.
-
----
-
-## Bucle de animación: `update_animation()`
-
-Se llama cada `speed` ms (por defecto 150 ms). Es el corazón del sistema. Ejecuta en orden:
-
-### 1. Física (cuando `is_falling = True`)
+### Fórmula de escala
 
 ```
-vel_y += gravity_factor      # Aceleración
-vel_x *= friction            # Fricción horizontal
-new_x = x() + vel_x
-new_y = y() + vel_y
-
-si new_y >= grab_y y vel_y > 0:
-    aterrizar → is_falling = False, cambiar a "idle"
+t = clamp((grab_y − y_min) / (y_max − y_min), 0.0, 1.0)
+altura = base_height × (min_factor + t × (1 − min_factor))
 ```
 
-### 2. Movimiento autónomo (cuando no está cayendo ni siendo arrastrado)
-
-- Si el estado es `look_l`, `look_r`, `walk_l` o `walk_r`, aplica una variación aleatoria de `grab_y` de ±z_step para simular movimiento en profundidad.
-- Clampea `grab_y` dentro de los límites `walkable_y_min_pc` y `walkable_y_max_pc`.
-- Mueve la ventana a `(x + current_move_speed, grab_y)`.
-- Llama a `check_screen_bounds()` para detectar colisiones con los bordes de pantalla.
-
-### 3. Renderizado
-
-- Llama a `update_scale()` para obtener la altura escalada.
-- Recorta el frame actual del spritesheet con `full_sheet.copy(QRect(...))`.
-- Escala el frame al tamaño calculado.
-- Dibuja el frame centrado en un canvas transparente del tamaño de la ventana.
-- Aplica el canvas al `QLabel` y actualiza la máscara de la ventana (para que solo sea clickable el área del sprite).
-- Avanza `current_frame` al siguiente.
-
----
-
-## Sistema de perspectiva (eje Z simulado)
-
-La profundidad se simula escalando el tamaño del personaje según su posición Y. Cuanto más abajo en pantalla (más cerca del espectador), más grande; cuanto más arriba (más al fondo), más pequeño.
-
-### `update_scale()` — Cálculo de escala
-
-Solo funciona si `environment.mode == "perspective"`.
-
-```
-y_min = walkable_y_min_pc% de screen.height
-y_max = walkable_y_max_pc% de screen.height − base_height
-t = (grab_y − y_min) / (y_max − y_min)      # valor entre 0.0 y 1.0
-min_f = min_scale_percent / 100              # ej: 0.10
-altura = base_height × (min_f + t × (1 − min_f))
-```
-
-Con los valores del config por defecto (`min_scale_percent=10`, zona caminable 50%-100%):
-- En el extremo superior de la zona: el sprite mide `base_height × 0.10` = 25 px
-- En el extremo inferior: el sprite mide `base_height × 1.0` = 250 px
+Con `min_scale_percent=10` y zona caminable 50%–100%:
+- En `y_min` → sprite de 25 px (10% de 250)
+- En `y_max` → sprite de 250 px (100% de 250)
 
 ### Reglas de escala en situaciones especiales
 
-| Situación | Comportamiento de escala |
+| Situación | Comportamiento |
 |---|---|
-| `is_falling = True` | Devuelve `locked_scale` (congelada) |
-| `is_dragging = True` y `y < grab_y` | Devuelve `locked_scale` (en el aire) |
-| `is_dragging = True` y `y >= grab_y` | Calcula escala normal según posición |
+| `is_falling = True` | Devuelve `locked_scale` (escala congelada) |
+| `is_dragging = True` y `window_y < grab_y` | Devuelve `locked_scale` (en el aire) |
+| `is_dragging = True` y `window_y >= grab_y` | Calcula escala normal |
+| `mode != "perspective"` | Devuelve `base_height` (sin escalado) |
+
+### Métodos
+
+| Método | Descripción |
+|---|---|
+| `compute_scale(...)` | Devuelve la altura del sprite en píxeles para este tick |
+| `walkable_bounds(screen_height)` | Devuelve `(y_min, y_max)` en píxeles absolutos |
 
 ---
 
-## Sistema de arrastre y lanzamiento
+## Módulo `renderer.py` — SpriteRenderer
 
-### `mousePressEvent()`
+Gestiona la carga de spritesheets y la composición de cada frame.
 
-1. Cambia cursor a mano cerrada.
-2. Congela la escala: `locked_scale = update_scale()`.
-3. Si no está cayendo, fija `grab_y = y()`.
-4. Activa `is_dragging = True`, cancela `is_falling`.
-5. Eleva la ventana al frente (`raise_()`).
-6. Guarda el offset del click y la posición del ratón.
-7. Cambia el estado a `drag_id`.
+### Proceso de renderizado (por tick)
 
-### `mouseMoveEvent()`
+1. Calcula el ancho proporcional a `sprite_height` (ratio del frame)
+2. Recorta el frame actual del spritesheet con `QPixmap.copy(QRect(...))`
+3. Escala el frame al tamaño calculado (smooth, mantiene aspecto)
+4. Dibuja el frame centrado en un canvas transparente de `canvas_size × canvas_size`
+5. Avanza `current_frame` al siguiente (con wrap-around)
 
-1. Calcula la velocidad como diferencia entre la posición actual y la anterior del ratón, multiplicada por `launch_multiplier`.
-2. Mueve la ventana a la posición del cursor menos el offset.
-3. Actualiza `grab_y` si el personaje está siendo arrastrado hacia abajo.
-4. Cambia el estado a `drag_mv`.
+### Variables de estado
 
-### `mouseReleaseEvent()`
+| Variable | Descripción |
+|---|---|
+| `full_sheet` | QPixmap con el spritesheet completo del estado actual |
+| `frame_w` / `frame_h` | Dimensiones de un frame individual |
+| `cols` | Número de frames en el spritesheet |
+| `current_frame` | Índice del frame que se está mostrando |
+| `real_sprite_size` | QSize con el tamaño real del sprite escalado (usado por colisión) |
 
-Analiza si el personaje debe caer o posarse:
+### Fallback
 
-```
-si y() < grab_y − 10  O  abs(vel_y) > 2:
-    is_falling = True → estado "fall"
-si no:
-    vel_x = vel_y = 0 → estado "idle"
-```
+Si el PNG no existe o está corrupto, `load_sheet()` genera un rectángulo magenta semitransparente para facilitar la depuración visual.
 
 ---
 
-## IA autónoma: `ai_think()`
+## Módulo `ai.py` — AIBrain
 
-Se ejecuta cada 4 000 ms. Si el personaje está siendo arrastrado o cayendo, no hace nada. En caso contrario, genera un número aleatorio entre 1 y 100 y decide:
+Decide el estado del personaje de forma autónoma cada 4 000 ms.
+
+### Tabla de decisiones
 
 | Rango | Estado resultante | Probabilidad |
 |---|---|---|
@@ -269,76 +210,168 @@ Se ejecuta cada 4 000 ms. Si el personaje está siendo arrastrado o cayendo, no 
 | 41–85 | Aleatorio entre `look_l`, `look_r`, `walk_l`, `walk_r` | 45% |
 | 86–100 | `angry` | 15% |
 
----
+Para añadir nuevos comportamientos, modifica la constante `DECISION_TABLE` en `ai.py`. La tabla usa probabilidad acumulada y debe sumar 100.
 
-## Colisión con bordes de pantalla: `check_screen_bounds()`
+### Método principal
 
-Calcula la posición real del sprite (teniendo en cuenta que el canvas es más grande que el sprite) y comprueba si sobresale por la izquierda o la derecha:
-
-- **Borde izquierdo:** mueve la ventana para que el sprite quede en el margen izquierdo; invierte `vel_x` con amortiguación × 0.6; cambia el estado a `look_r`.
-- **Borde derecho:** idem en sentido contrario; cambia el estado a `look_l`.
-
----
-
-## Cambio de estado: `change_state()`
-
-Solo actúa si el nuevo estado es diferente al actual. Actualiza `current_state` y llama a `load_animation()` con el nuevo estado.
-
-### `load_animation(state)`
-
-1. Busca la entrada del estado en `config["animations"]`.
-2. Carga el spritesheet con `QPixmap`.
-3. Si la imagen falla, usa un rectángulo magenta como fallback.
-4. Actualiza `gravity_factor`, `current_move_speed`, `frame_w`, `frame_h`, `cols`.
-5. Reinicia `current_frame = 0`.
-6. Reinicia `anim_timer` con la velocidad del nuevo estado.
+| Método | Descripción |
+|---|---|
+| `think(is_dragging, is_falling)` | Ejecuta un ciclo de decisión; no hace nada si el personaje está siendo controlado |
 
 ---
 
-## Timers
+## Módulo `debug.py` — DebugHUD
+
+Imprime una línea de estado en el terminal sobreescribiéndola en cada tick.
+
+### Formato de salida
+
+```
+ESTADO: IDLE         | POS:  940, 980 | SPRITE: 250x250 | VEL: x: +0.0, y: +0.0 | G:1.20 F:0.95 L:0.80
+```
+
+Usa los códigos ANSI `\r\033[2K` para volver al inicio de la línea y borrarla antes de escribir. En terminales sin soporte ANSI (ej. CMD de Windows sin modo ANSI), degrada a simples retornos de carro.
+
+### Métodos auxiliares
+
+| Método | Descripción |
+|---|---|
+| `print(...)` | Sobreescribe la línea actual con el estado del personaje |
+| `DebugHUD.error(msg)` | Imprime un error en una nueva línea |
+| `DebugHUD.warn(msg)` | Imprime un aviso en una nueva línea |
+| `DebugHUD.info(msg)` | Imprime un mensaje informativo en una nueva línea |
+
+---
+
+## Clase principal: `CyberPet` (main.py)
+
+Hereda de `QMainWindow`. Actúa como coordinador de todos los subsistemas.
+
+### Flags de la ventana Qt
+
+- `FramelessWindowHint` — sin barra de título ni bordes
+- `WindowStaysOnTopHint` — siempre encima de otras ventanas
+- `Tool` — no aparece en la barra de tareas
+- `WA_TranslucentBackground` — fondo transparente
+
+### Timers
 
 | Timer | Intervalo | Callback | Propósito |
 |---|---|---|---|
 | `anim_timer` | Variable (del JSON, por defecto 150 ms) | `update_animation` | Bucle principal: física + render |
-| `ai_timer` | 4 000 ms | `ai_think` | Toma de decisiones autónomas |
+| `ai_timer` | 4 000 ms | `ai_brain.think` | Toma de decisiones autónomas |
+
+### Flujo de `update_animation()`
+
+```
+1. Física
+   ├── is_falling  → _tick_falling()  → physics.tick_fall()
+   └── autónomo    → _tick_autonomous() → physics.tick_autonomous()
+
+2. Colisión con bordes → _check_screen_bounds() → physics.bounce_horizontal()
+
+3. Perspectiva → perspective.compute_scale()
+
+4. Renderizado → renderer.render_frame() → label.setPixmap() + setMask()
+
+5. Debug → hud.print()
+```
+
+### Eventos de ratón
+
+#### `mousePressEvent`
+1. Cursor → mano cerrada
+2. Congela la escala (`locked_scale = perspective.compute_scale(...)`)
+3. `physics.start_drag(y_actual)`
+4. Eleva la ventana al frente (`raise_()`)
+5. Guarda offset del click y posición del ratón
+6. `change_state("drag_id")`
+
+#### `mouseMoveEvent`
+1. Calcula delta del ratón y actualiza `physics.update_drag_velocity(dx, dy)`
+2. Mueve la ventana: `self.move(cursor − offset)`
+3. `physics.update_grab_y_on_drag(y_actual)`
+4. `change_state("drag_mv")`
+
+#### `mouseReleaseEvent`
+1. Cursor → mano abierta
+2. `physics.release_drag()` → devuelve `should_fall`
+3. Si `should_fall` → `change_state("fall")`; si no → `change_state("idle")`
 
 ---
 
-## Punto de entrada
+## Bucle de animación detallado
 
-```python
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    skin_path = <directorio_del_script>/../assets/skins/default
-    pet = CyberPet(skin_path)
-    sys.exit(app.exec())
+### Caída libre (`_tick_falling`)
+
+```
+vel_y += gravity_factor
+vel_x *= friction
+new_x = x + vel_x
+new_y = y + vel_y
+
+si new_y >= grab_y y vel_y > 0:
+    aterrizar → is_falling = False, vel = 0, change_state("idle")
+
+mover ventana a (new_x, new_y)
+_check_screen_bounds()
 ```
 
-La ruta del skin se construye de forma relativa al script, por lo que el ejecutable debe lanzarse desde la carpeta `src/` o mediante el script `start.sh`.
+### Movimiento autónomo (`_tick_autonomous`)
+
+```
+si estado en {look_l, look_r, walk_l, walk_r}:
+    grab_y += random.choice([-1, 0, 1]) * z_step
+    grab_y = clamp(grab_y, y_min, y_max)
+
+new_x = x + current_move_speed
+mover ventana a (new_x, grab_y)
+_check_screen_bounds()
+```
 
 ---
 
-## Debug en consola
+## Colisión con bordes de pantalla
 
-En cada tick de `update_animation` se sobreescribe la misma línea de la consola con:
+`_check_screen_bounds()` calcula la posición real del sprite (no del canvas) y actúa si sobresale:
 
-```
-ESTADO: IDLE | POS: 940,980 | SPRITE: 250x250 | VEL: x:0.0, y:0.0 | G:1.2 F:0.95 L:0.8
-```
+- **Borde izquierdo:** recoloca el sprite en el margen; `vel_x = +abs(vel_x) × 0.6`; `change_state("look_r")`
+- **Borde derecho:** idem en sentido contrario; `vel_x = -abs(vel_x) × 0.6`; `change_state("look_l")`
 
-Esto permite monitorear en tiempo real el estado, posición, tamaño del sprite y valores de física sin saturar el terminal.
+La amortiguación de 0.6 evita rebotes infinitos y da naturalidad al movimiento.
 
 ---
 
 ## Cómo añadir un nuevo estado
 
 1. Añadir el spritesheet PNG en `assets/skins/default/`.
-2. Añadir la entrada en `config.json` dentro de `"animations"` con `file`, `cols`, `speed` y `move_speed`.
-3. Llamar a `change_state("nombre_nuevo")` desde el código donde corresponda (por ejemplo en `ai_think` o en un evento de teclado).
+2. Añadir la entrada en `config.json` dentro de `"animations"`.
+3. Llamar a `change_state("nombre_nuevo")` desde `ai.py` (tabla `DECISION_TABLE`) o desde `main.py`.
 
 ## Cómo crear un nuevo skin
 
 1. Crear una carpeta nueva en `assets/skins/nombre_skin/`.
 2. Copiar y adaptar `config.json`.
 3. Añadir los PNGs de cada animación.
-4. Cambiar `skin_path` en el punto de entrada (o implementar la lectura de `data/config.json`).
+4. Cambiar `skin_path` en el punto de entrada de `main.py`.
+
+## Cómo desactivar el debug
+
+En `main.py`, al crear el `DebugHUD`:
+
+```python
+self.hud = DebugHUD(enabled=False)
+```
+
+## Punto de entrada
+
+```python
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    main_dir  = os.path.dirname(os.path.abspath(__file__))
+    skin_path = os.path.abspath(os.path.join(main_dir, "..", "assets", "skins", "default"))
+    pet = CyberPet(skin_path)
+    sys.exit(app.exec())
+```
+
+Lanzar siempre desde la carpeta `src/` o mediante el script `start.sh` del proyecto.
