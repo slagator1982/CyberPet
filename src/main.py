@@ -201,7 +201,7 @@ class CyberPet(QMainWindow):
         screen = QApplication.primaryScreen().availableGeometry()
         y_min = int((env.get("walkable_y_min_pc", 0) / 100) * screen.height())
         y_max = int((env.get("walkable_y_max_pc", 100) / 100) * screen.height() - self.base_height)
-        t = max(0.0, min((self.y() - y_min) / (y_max - y_min), 1.0))
+        t = max(0.0, min((self.grab_y - y_min) / (y_max - y_min), 1.0))
         min_f = env.get("min_scale_percent", 30) / 100
         return int(self.base_height * (min_f + (t * (1.0 - min_f))))
 
