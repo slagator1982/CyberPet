@@ -211,8 +211,8 @@ class CyberPet(QMainWindow):
         env = self.config.get("environment", {})
         
         # Obtenemos porcentajes de inicio o valores por defecto
-        start_x_pc = env.get("start_x_pc", 50) / 100
-        start_y_pc = env.get("start_y_pc", 90) / 100
+        start_x_pc = self.config.get("start_x_pc", 50) / 100
+        start_y_pc = self.config.get("start_y_pc", 90) / 100
         
         # Calculamos posición real (centrando el canvas)
         x_pos = int((screen.width() * start_x_pc) - (self.width() / 2))
