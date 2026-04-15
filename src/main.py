@@ -209,10 +209,18 @@ class CyberPet(QMainWindow):
     def set_initial_position(self):
         screen = QApplication.primaryScreen().availableGeometry()
         env = self.config.get("environment", {})
-        y_max_pc = env.get("walkable_y_max_pc", 100) / 100
-        y_pos = int((screen.height() * y_max_pc) - self.base_height)
-        self.move((screen.width() - self.width()) // 2, y_pos)
-        self.grab_y = y_pos 
+        
+        # Obtenemos porcentajes de inicio o valores por defecto
+        start_x_pc = env.get("start_x_pc", 50) / 100
+        start_y_pc = env.get("start_y_pc", 90) / 100
+        
+        # Calculamos posición real (centrando el canvas)
+        x_pos = int((screen.width() * start_x_pc) - (self.width() / 2))
+        y_pos = int((screen.height() * start_y_pc) - (self.height() / 2))
+        
+        self.move(x_pos, y_pos)
+        # El suelo inicial (grab_y) es la posición Y actual
+        self.grab_y = y_pos
 
     def ai_think(self):
         if self.is_dragging or self.is_falling: return
