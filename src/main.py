@@ -37,6 +37,7 @@ class CyberPet(QMainWindow):
         self.launch_mult = self.config.get("launch_multiplier", 0.8)
         self.friction = self.config.get("friction", 0.95)
         self.gravity_factor = self.config.get("gravity", 1.2)
+        self.z_step = self.config.get("z_step", 0.5)
         
         self.locked_scale = self.base_height 
         self.canvas_size_val = int(self.base_height * 2.0)
