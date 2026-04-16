@@ -33,6 +33,7 @@ Estructura de archivos del proyecto:
 import sys
 import os
 import json
+import random
 
 from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt6.QtCore import QTimer, Qt, QPoint, QSize
@@ -203,7 +204,13 @@ class CyberPet(QMainWindow):
         self.physics.set_gravity(gravity)
 
         # Guardamos la velocidad de movimiento autónomo de esta animación
-        self._current_move_speed: float = anim_data.get("move_speed", 0)
+        self._current_move_speed_x: float = anim_data.get("move_speed_x", 0)
+        self._current_move_speed_y: float = anim_data.get("move_speed_y", 0)
+        self._current_move_z_mode: float = anim_data.get("z_mode", "none")
+        if anim_data.get("z_mode", "none") == "random":
+            self._current_move_speed_y = self._current_move_speed_y * random.choice([-1, 0, 1])
+        if anim_data.get("z_mode", "none") == "none":
+            self._current_move_speed_y = 0
 
         # Reiniciamos el timer con la velocidad de esta animación
         self.anim_timer.start(anim_data.get("speed", 150))
@@ -291,7 +298,10 @@ class CyberPet(QMainWindow):
 
         new_x, new_grab_y = self.physics.tick_autonomous(
             current_x  = float(self.x()),
-            move_speed = self._current_move_speed,
+            move_speed_x = self._current_move_speed_x,
+            current_y  = float(self.y()),
+            move_speed_y = self._current_move_speed_y,
+            z_mode = self._current_move_z_mode,
             state      = self.current_state,
             y_min      = y_min,
             y_max      = y_max,

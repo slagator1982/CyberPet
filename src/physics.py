@@ -84,7 +84,10 @@ class PhysicsEngine:
     def tick_autonomous(
         self,
         current_x: float,
-        move_speed: float,
+        move_speed_x: float,
+        current_y: float,
+        move_speed_y: float,
+        z_mode: str,
         state: str,
         y_min: float,
         y_max: float,
@@ -96,24 +99,32 @@ class PhysicsEngine:
         de grab_y en el rango ±z_step para simular desplazamiento en profundidad.
 
         Args:
-            current_x  : posición X actual de la ventana
-            move_speed : desplazamiento X por tick (del JSON de la animación)
-            state      : estado actual del personaje (ej. "walk_l", "idle")
-            y_min      : límite superior de la zona caminable (px)
-            y_max      : límite inferior de la zona caminable (px)
+            current_x    : posición X actual de la ventana
+            move_speed_x : desplazamiento X por tick (del JSON de la animación)
+            current_y    : posición X actual de la ventana
+            move_speed_y : desplazamiento Y por tick (del JSON de la animación)
+            z_mode       : modo del dezplazamiento z none/fixed/random 
+            y_min        : límite superior de la zona caminable (px)
+            y_max        : límite inferior de la zona caminable (px)
+            state        : estado actual del personaje (ej. "walk_l", "idle")
 
         Devuelve:
             (new_x, new_grab_y)
         """
-        # Solo los estados de movimiento o mirada generan variación Z
-        mobile_states = {"look_l", "look_r", "walk_l", "walk_r"}
-        if state in mobile_states:
-            delta_z = random.choice([-1, 0, 1]) * self.z_step
-            self.grab_y += delta_z
-            # Clampear dentro de los límites del área caminable
-            self.grab_y = max(y_min, min(self.grab_y, y_max))
+        # # Solo los estados de movimiento o mirada generan variación Z
+        # mobile_states = {"look_l", "look_r", "walk_l", "walk_r"}
+        # if state in mobile_states:
+        #     delta_z = random.choice([-1, 0, 1]) * self.z_step
+        #     self.grab_y += delta_z
+        #     # Clampear dentro de los límites del área caminable
+        #     self.grab_y = max(y_min, min(self.grab_y, y_max))
 
-        new_x = current_x + move_speed
+        y_min = 160 # Eliminar cuando se arregle el problema de las perspectivas
+        y_max = 487 #
+        self.grab_y += move_speed_y
+        self.grab_y = max(y_min, min(self.grab_y, y_max))
+
+        new_x = current_x + move_speed_x
         return new_x, self.grab_y
 
     # ──────────────────────────────────────────────────────────────────────
