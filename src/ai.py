@@ -26,11 +26,18 @@ from typing import Callable
 #   2. Añade una nueva entrada con el nombre del estado y su peso
 #   3. Asegúrate de que el estado esté definido en config.json
 #
-DECISION_TABLE: list[tuple[int, str | list[str]]] = [
-    (40, "idle"),                                       # 40% → reposo
-    (85, ["look_l", "look_r", "walk_l", "walk_r"]),    # 45% → movimiento/mirada
-    (100, "angry"),                                     # 15% → enfado
+
+# DECISION_TABLE = [
+#     (40, ("idle", None)),
+#     (85, (["look_l", "look_r", "walk_l", "walk_r"], "glitch")),
+#     (100, ("angry", "alarm")),
+# ]
+DECISION_TABLE = [
+    (40, ("idle", None)),
+    (85, (["look_l", "look_r", "walk_l", "walk_r"], "glitch")),
+    (100, ("angry", "alarm")),
 ]
+
 
 
 class AIBrain:
@@ -55,7 +62,7 @@ class AIBrain:
     # Toma de decisión
     # ──────────────────────────────────────────────────────────────────────
 
-    def think(self, is_dragging: bool, is_falling: bool):
+    def think(self, is_dragging: bool, is_falling: bool, speech_key=None):
         """
         Ejecuta un ciclo de decisión autónoma.
 
@@ -71,17 +78,11 @@ class AIBrain:
             return
 
         roll = random.randint(1, 100)
-
         for threshold, outcome in DECISION_TABLE:
             if roll <= threshold:
-                # Si el outcome es una lista, elegimos uno al azar
-                if isinstance(outcome, list):
-                    chosen = random.choice(outcome)
-                else:
-                    chosen = outcome
-
-                self._on_state_change(chosen)
+                states, speech_key = outcome # Desempaquetamos la tupla
+                chosen_state = random.choice(states) if isinstance(states, list) else states
+                
+                # Pasamos ambos parámetros al callback
+                self._on_state_change(chosen_state, speech_key) 
                 return
-
-        # Fallback de seguridad (no debería alcanzarse si la tabla suma 100)
-        self._on_state_change("idle")

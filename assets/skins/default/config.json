@@ -87,8 +87,23 @@
         }
     },
     "dialogs": {
-        "glitch": ["▰▱▰▱", "▓▒░ ERROR ░▒▓", "⬡⬢"],
-        "binary": ["1011Ø1", "ØxDEADCØDE"],
-        "alarm": ["▲ WARNING ▲", "🕱 🕱 🕱"]
+        "glitch": [
+            "▰▱▰▱ ⬡⬢", 
+            "▓▒░ SYNC_ERR ░▒▓", 
+            "⏷⏶ ⏵⏴ ⏷⏶", 
+            "🯅 🯆 🯇 🯈"
+        ],
+        "binary_corrupt": [
+            "1011Ø1𝟢1", 
+            "ØxDEADCØDE", 
+            "Σ𝝮ΓΔ", 
+            "√π ÷ ∞"
+        ],
+        "alarm": [
+            "▲▲ WARNING ▲▲", 
+            "█▓▒░ CRITICAL_HACK ░▒▓█", 
+            "⬢⬢⬢", 
+            "🕱 🕱 🕱"
+        ]
     }
 }

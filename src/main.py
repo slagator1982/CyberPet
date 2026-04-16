@@ -45,7 +45,7 @@ from perspective import PerspectiveSystem
 from renderer    import SpriteRenderer
 from ai          import AIBrain
 from debug       import DebugHUD
-
+from speech      import SpeechBubble
 
 class CyberPet(QMainWindow):
     """
@@ -112,6 +112,9 @@ class CyberPet(QMainWindow):
 
         # ── Estado de la animación ────────────────────────────────────────
         self.current_state: str = "idle"
+
+        # ── Para los dialogos del personaje
+        self.bubble = SpeechBubble()
 
         # ── Timers ────────────────────────────────────────────────────────
         # anim_timer: bucle principal (física + render)
@@ -250,6 +253,8 @@ class CyberPet(QMainWindow):
 
         # ── 3. Renderizado ────────────────────────────────────────────────
         canvas = self.renderer.render_frame(sprite_height)
+        # ── Dialogo del personaje ─────────────────────────────────────────
+        self.bubble.update_position(self.frameGeometry())
 
         # Aplicamos el canvas al QLabel y actualizamos la máscara de click
         self.label.setPixmap(canvas)
@@ -349,7 +354,7 @@ class CyberPet(QMainWindow):
     # Cambio de estado
     # ──────────────────────────────────────────────────────────────────────
 
-    def change_state(self, new_state: str):
+    def change_state(self, new_state: str, speech_key=None):
         """
         Transiciona el personaje a un nuevo estado de animación.
         Solo actúa si el estado es diferente al actual (evita recargas innecesarias).
@@ -360,6 +365,12 @@ class CyberPet(QMainWindow):
         if self.current_state != new_state:
             self.current_state = new_state
             self.load_animation(new_state)
+
+        # Lógica de diálogo
+        if speech_key and "dialogs" in self.config:
+            phrases = self.config["dialogs"].get(speech_key, [])
+            if phrases:
+                self.bubble.speak(random.choice(phrases))
 
     # ──────────────────────────────────────────────────────────────────────
     # Eventos de ratón
