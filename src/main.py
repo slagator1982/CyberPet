@@ -253,16 +253,25 @@ class CyberPet(QMainWindow):
 
         # ── 3. Renderizado ────────────────────────────────────────────────
         canvas = self.renderer.render_frame(sprite_height)
-        # ── Dialogo del personaje ─────────────────────────────────────────
-        self.bubble.update_position(self.frameGeometry())
 
         # Aplicamos el canvas al QLabel y actualizamos la máscara de click
         self.label.setPixmap(canvas)
         self.label.setGeometry(0, 0, self.width(), self.height())
         self.setMask(canvas.mask())   # Solo el área del sprite recibe eventos de ratón
 
-        # ── 4. Debug HUD ──────────────────────────────────────────────────
+        # ── Diálogo del personaje ─────────────────────────────────────────
+        # Pasamos la posición y tamaño REAL del sprite (no del canvas entero)
+        # para que la burbuja se ancle a la cabeza con precisión.
         sz = self.renderer.real_sprite_size
+        self.bubble.update_position(
+            window_x    = self.x(),
+            window_y    = self.y(),
+            canvas_size = self.canvas_size_val,
+            sprite_w    = sz.width(),
+            sprite_h    = sz.height(),
+        )
+
+        # ── 4. Debug HUD ──────────────────────────────────────────────────
         self.hud.print(
             state      = self.current_state,
             x          = self.x(),
