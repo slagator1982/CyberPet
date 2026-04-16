@@ -12,7 +12,6 @@
     "gravity": 1.2,
     "launch_multiplier": 0.8,
     "friction": 0.95,
-    "z_step": 5,
     "animations": {
         "idle": { 
             "file": "idle.png", 

@@ -206,7 +206,6 @@ class CyberPet(QMainWindow):
         # Guardamos la velocidad de movimiento autónomo de esta animación
         self._current_move_speed_x: float = anim_data.get("move_speed_x", 0)
         self._current_move_speed_y: float = anim_data.get("move_speed_y", 0)
-        self._current_move_z_mode: float = anim_data.get("z_mode", "none")
         if anim_data.get("z_mode", "none") == "random":
             self._current_move_speed_y = self._current_move_speed_y * random.choice([-1, 0, 1])
         if anim_data.get("z_mode", "none") == "none":
@@ -301,7 +300,6 @@ class CyberPet(QMainWindow):
             move_speed_x = self._current_move_speed_x,
             current_y  = float(self.y()),
             move_speed_y = self._current_move_speed_y,
-            z_mode = self._current_move_z_mode,
             state      = self.current_state,
             y_min      = y_min,
             y_max      = y_max,
