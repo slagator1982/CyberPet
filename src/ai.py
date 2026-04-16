@@ -27,12 +27,8 @@ from typing import Callable
 #   3. Asegúrate de que el estado esté definido en config.json
 #
 
-# DECISION_TABLE = [
-#     (40, ("idle", None)),
-#     (85, (["look_l", "look_r", "walk_l", "walk_r"], "glitch")),
-#     (100, ("angry", "alarm")),
-# ]
 DECISION_TABLE = [
+    (20, ("sleep", "sleep")),
     (40, ("idle", None)),
     (85, (["look_l", "look_r", "walk_l", "walk_r"], "glitch")),
     (100, ("angry", "alarm")),

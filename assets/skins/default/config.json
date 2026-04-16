@@ -19,7 +19,15 @@
             "speed": 150, 
             "move_speed_x": 0,
             "move_speed_y": 0,
-            "z_mode": "fixed"
+            "z_mode": "none"
+        },
+        "sleep": { 
+            "file": "sleep.png", 
+            "cols": 6, 
+            "speed": 150, 
+            "move_speed_x": 0,
+            "move_speed_y": 0,
+            "z_mode": "none"
         },
         "look_l": { 
             "file": "look_left.png", 
@@ -104,6 +112,10 @@
             "█▓▒░ CRITICAL_HACK ░▒▓█", 
             "⬢⬢⬢", 
             "🕱 🕱 🕱"
+        ],
+        "sleep":[
+            "Kill All Humans 🯆 🯇 🯈 🕱 🕱 🕱 🕱",
+            "Updating"
         ]
     }
 }
