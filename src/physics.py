@@ -105,8 +105,6 @@ class PhysicsEngine:
         Devuelve:
             (new_x, new_grab_y)
         """
-        y_min = 160 # Eliminar cuando se arregle el problema del dezplazamiento de las coordenadas
-        y_max = 487 # Eliminar cuando se arregle el problema del dezplazamiento de las coordenadas
         self.grab_y += move_speed_y
         self.grab_y = max(y_min, min(self.grab_y, y_max))
 

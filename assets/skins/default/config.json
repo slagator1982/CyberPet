@@ -1,13 +1,13 @@
 {
     "skin_name": "CyberDroid Original",
-    "base_height": 250,
+    "base_height": 200,
     "start_x_pc": 50,
-    "start_y_pc": 85,
+    "start_y_pc": 75,
     "environment": {
-        "mode": "perspective", 
-        "min_scale_percent": 10,
         "walkable_y_min_pc": 50,
-        "walkable_y_max_pc": 100
+        "walkable_y_max_pc": 102,
+        "mode": "perspective", 
+        "min_scale_percent": 20
     },
     "gravity": 1.2,
     "launch_multiplier": 0.8,
@@ -19,7 +19,7 @@
             "speed": 150, 
             "move_speed_x": 0,
             "move_speed_y": 0,
-            "z_mode": "none"
+            "z_mode": "fixed"
         },
         "sleep": { 
             "file": "sleep.png", 
