@@ -1,33 +1,25 @@
 """
-main.py — Punto de entrada y clase principal de CyberPet
-=========================================================
-Orquesta todos los subsistemas del proyecto:
+main.py — Coordinador principal de CyberPet
+============================================
+Orquesta PhysicsEngine, PerspectiveSystem, SpriteRenderer, AIBrain,
+DebugHUD y SpeechBubble.
 
-    PhysicsEngine     → física de gravedad, fricción, rebotes
-    PerspectiveSystem → escalado del sprite según posición Y (eje Z)
-    SpriteRenderer    → carga de spritesheets y composición de frames
-    AIBrain           → decisiones autónomas del personaje
-    DebugHUD          → línea de debug en consola (in-place)
+── Orden del bucle de animación ─────────────────────────────────────────────
+  1. compute_scale()      → sprite_height con posición actual
+  2. render_frame()       → dibuja y actualiza real_sprite_size
+  3. Física               → tick_fall / tick_autonomous
+  4. check_screen_bounds  → colisiones laterales (usa real_sprite_size correcto)
+  5. bubble / hud
 
-La clase CyberPet hereda de QMainWindow y actúa como coordinador:
-recibe eventos de Qt (ratón, timers) y delega la lógica en los módulos.
+render_frame() ANTES de la física para que check_screen_bounds use
+el real_sprite_size del tick actual (si fuese al revés, el primer tick
+usaría QSize(0,0) → offset_x = canvas_size//2 → pared invisible 250px adentro).
 
-Estructura de archivos del proyecto:
-    Archivador/
-    ├── src/
-    │   ├── main.py          ← este archivo
-    │   ├── physics.py       ← motor de física
-    │   ├── perspective.py   ← sistema de perspectiva (eje Z)
-    │   ├── renderer.py      ← renderizado de sprites
-    │   ├── ai.py            ← inteligencia artificial autónoma
-    │   └── debug.py         ← HUD de debug en consola
-    ├── assets/
-    │   └── skins/
-    │       └── default/
-    │           ├── config.json
-    │           └── *.png
-    └── data/
-        └── config.json
+── Coordenadas ───────────────────────────────────────────────────────────────
+Todas las posiciones usan coordenadas absolutas de escritorio.
+screen = availableGeometry() → rect con .x(), .y(), .width(), .height()
+Las fórmulas siempre añaden screen.x() / screen.y() como base para que
+funcionen con barras de tareas, múltiples monitores y factores de escala DPI.
 """
 
 import sys
@@ -39,7 +31,6 @@ from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt6.QtCore import QTimer, Qt, QPoint, QSize
 from PyQt6.QtGui import QPixmap
 
-# ── Módulos propios ────────────────────────────────────────────────────────────
 from physics     import PhysicsEngine
 from perspective import PerspectiveSystem
 from renderer    import SpriteRenderer
@@ -47,104 +38,86 @@ from ai          import AIBrain
 from debug       import DebugHUD
 from speech      import SpeechBubble
 
+
 class CyberPet(QMainWindow):
-    """
-    Ventana principal de la mascota virtual.
-
-    Es una ventana transparente, sin bordes y siempre encima de las demás.
-    Coordina los subsistemas en cada tick del bucle de animación.
-
-    Timers activos:
-        anim_timer (variable, por defecto 150 ms) → update_animation()
-        ai_timer   (4 000 ms fijo)                → ai_brain.think()
-    """
-
-    # ──────────────────────────────────────────────────────────────────────
-    # Inicialización
-    # ──────────────────────────────────────────────────────────────────────
+    """Ventana principal de la mascota virtual."""
 
     def __init__(self, skin_folder: str):
-        """
-        Args:
-            skin_folder : ruta absoluta a la carpeta del skin activo
-                          (debe contener config.json y los PNGs de animación)
-        """
         super().__init__()
 
-        # ── Configuración de la ventana Qt ────────────────────────────────
         self.setWindowFlags(
-            Qt.WindowType.FramelessWindowHint      # Sin barra de título
-            | Qt.WindowType.WindowStaysOnTopHint   # Siempre encima
-            | Qt.WindowType.Tool                   # No aparece en la barra de tareas
+            Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowStaysOnTopHint
+            | Qt.WindowType.Tool
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
-        # QLabel interno que actúa como lienzo de píxeles
         self.label = QLabel(self)
         self.label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
 
         self.skin_path = os.path.abspath(skin_folder)
+        self.config    = self._load_config()
 
-        # ── Carga del config.json ─────────────────────────────────────────
-        self.config = self._load_config()
-
-        # ── Dimensiones del canvas ────────────────────────────────────────
-        # El canvas es cuadrado y siempre tiene el doble del tamaño base
-        # del sprite para que éste quepa en cualquier posición de escala.
-        self.base_height:    int = self.config.get("base_height", 250)
-        self.canvas_size_val: int = int(self.base_height * 2.0)
+        self.base_height:     int = self.config.get("base_height", 250)
+        self.canvas_size_val: int = self.base_height * 2
         self.setFixedSize(self.canvas_size_val, self.canvas_size_val)
 
-        # ── Subsistemas ───────────────────────────────────────────────────
         self.physics     = PhysicsEngine(self.config)
         self.perspective = PerspectiveSystem(self.config, self.base_height)
         self.renderer    = SpriteRenderer(self.base_height, self.canvas_size_val)
         self.hud         = DebugHUD(enabled=True)
         self.ai_brain    = AIBrain(on_state_change=self.change_state)
+        self.bubble      = SpeechBubble()
 
-        # ── Estado interno de arrastre ────────────────────────────────────
-        # Estos valores son exclusivos del manejo de eventos Qt y no
-        # tienen cabida en PhysicsEngine (que no conoce Qt).
-        self.offset:          QPoint = QPoint(0, 0)  # Offset del click sobre el sprite
-        self.last_mouse_pos:  QPoint = QPoint(0, 0)  # Posición del ratón en el tick anterior
-        self.locked_scale:    int    = self.base_height  # Escala congelada durante drag/caída
+        self.offset:          QPoint = QPoint(0, 0)
+        self.last_mouse_pos:  QPoint = QPoint(0, 0)
+        self.locked_scale:    int    = self.base_height
 
-        # ── Estado de la animación ────────────────────────────────────────
-        self.current_state: str = "idle"
+        self.current_state:         str   = "idle"
+        self._current_move_speed_x: float = 0.0
+        self._current_move_speed_y: float = 0.0
 
-        # ── Para los dialogos del personaje
-        self.bubble = SpeechBubble()
-
-        # ── Timers ────────────────────────────────────────────────────────
-        # anim_timer: bucle principal (física + render)
         self.anim_timer = QTimer()
         self.anim_timer.timeout.connect(self.update_animation)
 
-        # ai_timer: toma de decisiones autónomas cada 4 segundos
         self.ai_timer = QTimer()
         self.ai_timer.timeout.connect(
             lambda: self.ai_brain.think(self.physics.is_dragging, self.physics.is_falling)
         )
         self.ai_timer.start(4000)
 
-        # ── Carga inicial y arranque ──────────────────────────────────────
         self.load_animation("idle")
         self._set_initial_position()
         self.show()
 
     # ──────────────────────────────────────────────────────────────────────
-    # Carga de configuración
+    # Helpers: geometría de pantalla
+    # ──────────────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _screen():
+        """Devuelve availableGeometry() de la pantalla primaria."""
+        return QApplication.primaryScreen().availableGeometry()
+
+    def _screen_params(self):
+        """
+        Devuelve (screen_top, screen_height) listos para pasar a perspective.
+
+        screen_top    = coordenada Y absoluta del borde superior del área disponible.
+        screen_height = altura del área disponible en píxeles.
+
+        Usar estos valores garantiza que las coordenadas de grab_y
+        coincidan con self.y(), que también es absoluto en el escritorio.
+        """
+        s = self._screen()
+        return float(s.y()), s.height()
+
+    # ──────────────────────────────────────────────────────────────────────
+    # Config
     # ──────────────────────────────────────────────────────────────────────
 
     def _load_config(self) -> dict:
-        """
-        Lee y parsea el config.json del skin.
-        Termina el proceso con un error si el archivo falta o está malformado.
-
-        Devuelve:
-            dict con la configuración completa del skin
-        """
         config_file = os.path.join(self.skin_path, "config.json")
         try:
             with open(config_file, "r", encoding="utf-8") as f:
@@ -159,109 +132,128 @@ class CyberPet(QMainWindow):
 
     def _set_initial_position(self):
         """
-        Coloca la ventana en la posición de inicio definida en el config.
+        Coloca la ventana según start_x_pc / start_y_pc del config
+        y decide si el personaje aparece en el suelo o cayendo.
 
-        Las coordenadas start_x_pc y start_y_pc se expresan como porcentaje
-        del tamaño de pantalla (0–100). El canvas se centra en ese punto.
-        Al terminar, grab_y queda fijado en la posición Y inicial (suelo de inicio).
+        ── Modo "free" ───────────────────────────────────────────────────
+        Aparece en start_y_pc. grab_y = clamp(y_pos, -inf, floor).
+        El suelo (floor) es el borde inferior de pantalla.
+        No inicia caída.
+
+        ── Modo "toolbar" ────────────────────────────────────────────────
+        grab_y = floor fijo (única línea de suelo).
+        La ventana se coloca en ese grab_y. No inicia caída.
+
+        ── Modo "perspective" ────────────────────────────────────────────
+        Se calcula y_pos a partir de start_y_pc.
+
+          · y_pos < grab_y_min  → spawn ENCIMA de la zona caminable.
+            El personaje cae hasta un punto aleatorio dentro del rango.
+            Esto incluye spawns fuera de pantalla (y_pos muy negativo).
+
+          · grab_y_min ≤ y_pos ≤ grab_y_max  → spawn DENTRO de la zona.
+            El personaje aparece en esa posición sin caída.
+
+          · y_pos > grab_y_max  → spawn DEBAJO del suelo.
+            Se clampea a grab_y_max (suelo). Sin caída.
         """
-        screen = QApplication.primaryScreen().availableGeometry()
+        s = self._screen()
+        screen_top  = float(s.y())
+        screen_h    = s.height()
+        screen_left = float(s.x())
+        screen_w    = s.width()
 
         start_x_pc = self.config.get("start_x_pc", 50) / 100.0
         start_y_pc = self.config.get("start_y_pc", 90) / 100.0
 
-        # Centramos el canvas en el punto de inicio
-        x_pos = int(screen.width()  * start_x_pc - self.width()  / 2)
-        y_pos = int(screen.height() * start_y_pc - self.height() / 2)
+        # Posición del canvas (top-left) en coordenadas absolutas de escritorio.
+        # Se usa screen.x()/screen.y() como base para que funcione con
+        # barras de tareas y múltiples monitores.
+        x_pos = int(screen_left + screen_w  * start_x_pc - self.canvas_size_val / 2)
+        y_pos = int(screen_top  + screen_h  * start_y_pc - self.canvas_size_val / 2)
 
-        self.move(x_pos, y_pos)
-        self.physics.grab_y = float(y_pos)   # El suelo inicial es la posición Y de arranque
+        grab_y_min, grab_y_max = self.perspective.walkable_bounds(screen_top, screen_h)
+        mode = self.perspective.mode
+
+        if mode == "free":
+            clamped = min(float(y_pos), grab_y_max)   # no salirse por abajo
+            self.physics.grab_y = clamped
+            self.move(x_pos, int(clamped))
+
+        elif mode == "toolbar":
+            # grab_y_min == grab_y_max == suelo fijo
+            self.physics.grab_y = grab_y_max
+            self.move(x_pos, int(grab_y_max))
+
+        else:  # "perspective"
+            if y_pos < grab_y_min:
+                # Encima de la zona → cae hasta punto aleatorio del suelo
+                grab_y_target = random.uniform(grab_y_min, grab_y_max)
+                self.physics.grab_y    = grab_y_target
+                self.physics.is_falling = True
+                self.move(x_pos, y_pos)
+                self.change_state("fall")
+            else:
+                # Dentro o debajo → clampear al suelo y colocar
+                clamped = max(grab_y_min, min(float(y_pos), grab_y_max))
+                self.physics.grab_y = clamped
+                self.move(x_pos, int(clamped))
 
     # ──────────────────────────────────────────────────────────────────────
-    # Carga de animación
+    # Animación
     # ──────────────────────────────────────────────────────────────────────
 
     def load_animation(self, state: str):
-        """
-        Carga el spritesheet del estado indicado y configura el timer de animación.
-
-        Si el estado no existe en el config, usa 'idle' como fallback.
-        También actualiza la gravedad activa (cada estado puede tener la suya propia).
-
-        Args:
-            state : nombre del estado (ej. "idle", "walk_l", "fall")
-        """
-        # Obtenemos los datos de la animación, con fallback a 'idle'
         animations = self.config.get("animations", {})
         anim_data  = animations.get(state, animations.get("idle", {}))
-
         if not anim_data:
             DebugHUD.error(f"No hay datos de animación para '{state}' ni para 'idle'.")
             return
 
-        # Delegamos la carga del spritesheet al renderer
         self.renderer.load_sheet(self.skin_path, anim_data)
+        self.physics.set_gravity(anim_data.get("gravity", self.config.get("gravity", 1.2)))
 
-        # Actualizamos la gravedad: cada animación puede sobreescribir la global
-        gravity = anim_data.get("gravity", self.config.get("gravity", 1.2))
-        self.physics.set_gravity(gravity)
+        self._current_move_speed_x = float(anim_data.get("move_speed_x", 0))
+        self._current_move_speed_y = float(anim_data.get("move_speed_y", 0))
 
-        # Guardamos la velocidad de movimiento autónomo de esta animación
-        self._current_move_speed_x: float = anim_data.get("move_speed_x", 0)
-        self._current_move_speed_y: float = anim_data.get("move_speed_y", 0)
-        if anim_data.get("z_mode", "none") == "random":
-            self._current_move_speed_y = self._current_move_speed_y * random.choice([-1, 0, 1])
-        if anim_data.get("z_mode", "none") == "none":
-            self._current_move_speed_y = 0
+        z_mode = anim_data.get("z_mode", "none")
+        if z_mode == "random":
+            self._current_move_speed_y *= random.choice([-1, 0, 1])
+        elif z_mode == "none":
+            self._current_move_speed_y = 0.0
 
-        # Reiniciamos el timer con la velocidad de esta animación
         self.anim_timer.start(anim_data.get("speed", 150))
 
     # ──────────────────────────────────────────────────────────────────────
-    # Bucle principal de animación
+    # Bucle principal
     # ──────────────────────────────────────────────────────────────────────
 
     def update_animation(self):
-        """
-        Tick principal del juego. Se ejecuta en cada disparo de anim_timer.
+        screen_top, screen_h = self._screen_params()
 
-        Orden de operaciones:
-          1. Física (caída libre o movimiento autónomo)
-          2. Comprobación de colisión con bordes de pantalla
-          3. Cálculo de escala (perspectiva)
-          4. Renderizado del frame actual
-          5. Actualización de la máscara de la ventana
-          6. Impresión del HUD de debug
-        """
-        # ── 1. Física ─────────────────────────────────────────────────────
+        # 1. Escala (con posición actual, antes de mover)
+        sprite_height = self.perspective.compute_scale(
+            grab_y       = self.physics.grab_y,
+            screen_top   = screen_top,
+            screen_height= screen_h,
+            is_dragging  = self.physics.is_dragging,
+            window_y     = float(self.y()),
+            locked_scale = self.locked_scale,
+        )
+
+        # 2. Renderizado → actualiza real_sprite_size para check_screen_bounds
+        canvas = self.renderer.render_frame(sprite_height)
+        self.label.setPixmap(canvas)
+        self.label.setGeometry(0, 0, self.width(), self.height())
+        self.setMask(canvas.mask())
+
+        # 3. Física
         if self.physics.is_falling:
             self._tick_falling()
         elif not self.physics.is_dragging:
             self._tick_autonomous()
 
-        # ── 2. Perspectiva y escala ───────────────────────────────────────
-        screen = QApplication.primaryScreen().availableGeometry()
-
-        sprite_height = self.perspective.compute_scale(
-            grab_y      = self.physics.grab_y,
-            screen_height = screen.height(),
-            is_falling  = self.physics.is_falling,
-            is_dragging = self.physics.is_dragging,
-            window_y    = float(self.y()),
-            locked_scale= self.locked_scale,
-        )
-
-        # ── 3. Renderizado ────────────────────────────────────────────────
-        canvas = self.renderer.render_frame(sprite_height)
-
-        # Aplicamos el canvas al QLabel y actualizamos la máscara de click
-        self.label.setPixmap(canvas)
-        self.label.setGeometry(0, 0, self.width(), self.height())
-        self.setMask(canvas.mask())   # Solo el área del sprite recibe eventos de ratón
-
-        # ── Diálogo del personaje ─────────────────────────────────────────
-        # Pasamos la posición y tamaño REAL del sprite (no del canvas entero)
-        # para que la burbuja se ancle a la cabeza con precisión.
+        # 4. Burbuja de diálogo
         sz = self.renderer.real_sprite_size
         self.bubble.update_position(
             window_x    = self.x(),
@@ -271,90 +263,85 @@ class CyberPet(QMainWindow):
             sprite_h    = sz.height(),
         )
 
-        # ── 4. Debug HUD ──────────────────────────────────────────────────
+        # 5. HUD de debug
         self.hud.print(
-            state      = self.current_state,
-            x          = self.x(),
-            y          = self.y(),
-            sprite_w   = sz.width(),
-            sprite_h   = sz.height(),
-            vel_x      = self.physics.vel_x,
-            vel_y      = self.physics.vel_y,
-            gravity    = self.physics.gravity_factor,
-            friction   = self.physics.friction,
-            launch_mult= self.physics.launch_mult,
+            state       = self.current_state,
+            x           = self.x(),
+            y           = self.y(),
+            sprite_w    = sz.width(),
+            sprite_h    = sz.height(),
+            vel_x       = self.physics.vel_x,
+            vel_y       = self.physics.vel_y,
+            gravity     = self.physics.gravity_factor,
+            friction    = self.physics.friction,
+            launch_mult = self.physics.launch_mult,
         )
 
     # ──────────────────────────────────────────────────────────────────────
-    # Sub-ticks de física
+    # Sub-ticks
     # ──────────────────────────────────────────────────────────────────────
 
     def _tick_falling(self):
-        """
-        Aplica física de caída libre y mueve la ventana.
-        Detecta el aterrizaje y transiciona a 'idle'.
-        """
+        """Caída libre. Aterriza cuando self.y() >= grab_y."""
         new_x, new_y, landed = self.physics.tick_fall(float(self.x()), float(self.y()))
         self.move(int(new_x), int(new_y))
         self._check_screen_bounds()
-
         if landed:
             self.change_state("idle")
 
     def _tick_autonomous(self):
-        """
-        Aplica movimiento autónomo (IA) cuando el personaje camina o mira.
-        Incluye la variación de profundidad (eje Z) y la colisión con bordes.
-        """
-        screen = QApplication.primaryScreen().availableGeometry()
-        y_min, y_max = self.perspective.walkable_bounds(screen.height())
+        """Movimiento autónomo dentro de la zona caminable."""
+        screen_top, screen_h = self._screen_params()
+        grab_y_min, grab_y_max = self.perspective.walkable_bounds(screen_top, screen_h)
+
+        # En modo free, grab_y_min es -inf: el personaje no tiene límite superior.
+        # Pero sí tiene límite inferior (grab_y_max = suelo).
+        if grab_y_min == float("-inf"):
+            grab_y_min = float(self.y()) - self.canvas_size_val  # límite práctico
 
         new_x, new_grab_y = self.physics.tick_autonomous(
-            current_x  = float(self.x()),
+            current_x    = float(self.x()),
             move_speed_x = self._current_move_speed_x,
-            current_y  = float(self.y()),
             move_speed_y = self._current_move_speed_y,
-            state      = self.current_state,
-            y_min      = y_min,
-            y_max      = y_max,
+            grab_y_min   = grab_y_min,
+            grab_y_max   = grab_y_max,
         )
-
         self.move(int(new_x), int(new_grab_y))
         self._check_screen_bounds()
 
     # ──────────────────────────────────────────────────────────────────────
-    # Colisión con bordes de pantalla
+    # Colisión con bordes laterales
     # ──────────────────────────────────────────────────────────────────────
 
     def _check_screen_bounds(self):
         """
-        Comprueba si el sprite ha salido de los bordes de la pantalla.
+        Rebote en los bordes izquierdo y derecho de la pantalla.
 
-        Calcula la posición real del sprite (no del canvas) y,
-        si sobresale por algún lado:
-          - Recoloca la ventana para que el sprite quede en el borde
-          - Invierte y amortigua la velocidad horizontal (rebote × 0.6)
-          - Cambia el estado a look_r (borde izquierdo) o look_l (borde derecho)
-        """
-        screen = QApplication.primaryScreen().availableGeometry()
-        sprite_w = self.renderer.real_sprite_size.width()
+        El sprite está centrado en el canvas. offset_x es el margen
+        horizontal entre el borde del canvas y el borde del sprite.
 
-        # El sprite está centrado dentro del canvas, así que calculamos su
-        # posición absoluta en pantalla a partir de la posición de la ventana
-        offset_x   = (self.canvas_size_val - sprite_w) // 2
-        actual_left = self.x() + offset_x
+        actual_left  = self.x() + offset_x
         actual_right = actual_left + sprite_w
 
-        if actual_left < screen.left():
-            # Rebote en el borde izquierdo
-            self.move(screen.left() - offset_x, self.y())
+        Cuando actual_right > screen.right(), el sprite toca el borde derecho.
+        La recolocación mueve la ventana para que el sprite quede exactamente
+        en el borde, con el margen transparente del canvas sobrando por fuera.
+        """
+        s        = self._screen()
+        sprite_w = self.renderer.real_sprite_size.width()
+        offset_x = (self.canvas_size_val - sprite_w) // 2
+
+        actual_left  = self.x() + offset_x
+        actual_right = actual_left + sprite_w
+
+        if actual_left < s.left():
+            self.move(s.left() - offset_x, self.y())
             self.physics.bounce_horizontal("left")
             if not self.physics.is_falling:
                 self.change_state("look_r")
 
-        elif actual_right > screen.right():
-            # Rebote en el borde derecho
-            self.move(screen.right() - sprite_w - offset_x, self.y())
+        elif actual_right > s.right():
+            self.move(s.right() - sprite_w - offset_x, self.y())
             self.physics.bounce_horizontal("right")
             if not self.physics.is_falling:
                 self.change_state("look_l")
@@ -364,18 +351,10 @@ class CyberPet(QMainWindow):
     # ──────────────────────────────────────────────────────────────────────
 
     def change_state(self, new_state: str, speech_key=None):
-        """
-        Transiciona el personaje a un nuevo estado de animación.
-        Solo actúa si el estado es diferente al actual (evita recargas innecesarias).
-
-        Args:
-            new_state : nombre del estado destino (debe existir en config.json)
-        """
         if self.current_state != new_state:
             self.current_state = new_state
             self.load_animation(new_state)
 
-        # Lógica de diálogo
         if speech_key and "dialogs" in self.config:
             phrases = self.config["dialogs"].get(speech_key, [])
             if phrases:
@@ -386,83 +365,42 @@ class CyberPet(QMainWindow):
     # ──────────────────────────────────────────────────────────────────────
 
     def mousePressEvent(self, event):
-        """
-        Inicia el arrastre cuando el usuario hace clic izquierdo sobre el sprite.
-
-        Pasos:
-          1. Cambia el cursor a mano cerrada
-          2. Congela la escala actual (locked_scale) para que no cambie durante el drag
-          3. Delega el inicio del drag al PhysicsEngine
-          4. Eleva la ventana al frente de todas las demás
-          5. Guarda el offset del click para mover la ventana de forma relativa
-        """
         if event.button() == Qt.MouseButton.LeftButton:
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
-            # Congelamos la escala antes de iniciar el drag
-            screen = QApplication.primaryScreen().availableGeometry()
+            screen_top, screen_h = self._screen_params()
             self.locked_scale = self.perspective.compute_scale(
                 grab_y       = self.physics.grab_y,
-                screen_height= screen.height(),
-                is_falling   = self.physics.is_falling,
+                screen_top   = screen_top,
+                screen_height= screen_h,
                 is_dragging  = self.physics.is_dragging,
                 window_y     = float(self.y()),
                 locked_scale = self.locked_scale,
             )
 
             self.physics.start_drag(locked_y=float(self.y()))
-            self.raise_()   # Ventana al frente
-
-            # Offset: distancia entre el punto de click y la esquina superior-izquierda
-            self.offset = event.position().toPoint()
+            self.raise_()
+            self.offset         = event.position().toPoint()
             self.last_mouse_pos = event.globalPosition().toPoint()
-
-            self.change_state("drag_id")   # Estado: cogido pero sin mover
+            self.change_state("drag_id")
 
     def mouseMoveEvent(self, event):
-        """
-        Mueve el personaje mientras el usuario arrastra.
-
-        Calcula la velocidad de arrastre como diferencia entre la posición
-        actual y la anterior del ratón (multiplicada por launch_mult),
-        de forma que al soltar se conserve esa inercia.
-        """
         if self.physics.is_dragging:
-            curr = event.globalPosition().toPoint()
-
-            # Velocidad = desplazamiento del ratón desde el último tick
+            curr    = event.globalPosition().toPoint()
             delta_x = curr.x() - self.last_mouse_pos.x()
             delta_y = curr.y() - self.last_mouse_pos.y()
             self.physics.update_drag_velocity(delta_x, delta_y)
             self.last_mouse_pos = curr
-
-            # Movemos la ventana siguiendo el cursor con el offset aplicado
             self.move(curr - self.offset)
-
-            # Actualizamos grab_y si el personaje ha bajado (nuevo suelo)
             self.physics.update_grab_y_on_drag(float(self.y()))
-
-            # Cambiamos al estado de arrastre activo (si no estábamos ya en él)
             if self.current_state != "drag_mv":
                 self.change_state("drag_mv")
 
     def mouseReleaseEvent(self, event):
-        """
-        Finaliza el arrastre y decide si el personaje cae o se posa.
-
-        Si el personaje está por encima del suelo (grab_y) o tiene
-        velocidad vertical apreciable, inicia la caída libre.
-        En caso contrario, aterriza en el sitio y pasa a 'idle'.
-        """
         if event.button() == Qt.MouseButton.LeftButton:
             self.setCursor(Qt.CursorShape.PointingHandCursor)
-
             should_fall = self.physics.release_drag()
-
-            if should_fall:
-                self.change_state("fall")
-            else:
-                self.change_state("idle")
+            self.change_state("fall" if should_fall else "idle")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -471,11 +409,7 @@ class CyberPet(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    # La ruta del skin se construye de forma relativa al script.
-    # Lanzar desde la carpeta src/ o usando el script start.sh del proyecto.
     main_dir  = os.path.dirname(os.path.abspath(__file__))
     skin_path = os.path.abspath(os.path.join(main_dir, "..", "assets", "skins", "default"))
-
     pet = CyberPet(skin_path)
     sys.exit(app.exec())

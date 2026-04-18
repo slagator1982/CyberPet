@@ -2,12 +2,12 @@
     "skin_name": "CyberDroid Original",
     "base_height": 200,
     "start_x_pc": 50,
-    "start_y_pc": 75,
+    "start_y_pc": 25,
     "environment": {
         "walkable_y_min_pc": 50,
         "walkable_y_max_pc": 102,
-        "mode": "perspective", 
-        "min_scale_percent": 20
+        "mode": "free", 
+        "min_scale_percent": 10
     },
     "gravity": 1.2,
     "launch_multiplier": 0.8,
